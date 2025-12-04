@@ -1,42 +1,110 @@
 const express = require('express');
 const router = express.Router();
 const User = require('../models/User');
+const axios = require('axios');
 
-// Sync User (Create or Update)
-router.post('/sync', async (req, res) => {
-    const { sub, email, name, picture } = req.body;
+const sendEmail = require('../utils/sendEmail');
+
+// Generate OTP
+const generateOTP = () => {
+    return Math.floor(100000 + Math.random() * 900000).toString();
+};
+
+// Send OTP
+router.post('/send-otp', async (req, res) => {
+    const { email } = req.body;
 
     try {
-        let user = await User.findOne({ auth0Id: sub });
+        let user = await User.findOne({ email });
 
         if (!user) {
             user = new User({
-                auth0Id: sub,
                 email,
-                name,
-                picture,
+                name: email.split('@')[0],
+                picture: `https://ui-avatars.com/api/?name=${email}&background=random`,
                 watchlist: []
             });
-            await user.save();
-        } else {
-            // Update user details if they changed
-            user.email = email;
-            user.name = name;
-            user.picture = picture;
-            await user.save();
         }
+
+        const otp = generateOTP();
+        const otpExpires = Date.now() + 10 * 60 * 1000; // 10 minutes
+
+        user.otp = otp;
+        user.otpExpires = otpExpires;
+        await user.save();
+
+        const message = `Your verification code is: ${otp}`;
+        const html = `
+            <div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto;">
+                <h2 style="color: #dc2626;">FlickWave Login Verification</h2>
+                <p>Hello,</p>
+                <p>Your verification code is:</p>
+                <h1 style="background: #f3f4f6; padding: 10px; text-align: center; letter-spacing: 5px; border-radius: 5px;">${otp}</h1>
+                <p>This code will expire in 10 minutes.</p>
+                <p>If you didn't request this, please ignore this email.</p>
+            </div>
+        `;
+
+        await sendEmail({
+            email: user.email,
+            subject: 'FlickWave Verification Code',
+            message,
+            html
+        });
+
+        res.status(200).json({ message: 'OTP sent successfully' });
+    } catch (error) {
+        console.error('Error sending OTP:', error);
+        console.error('Error Stack:', error.stack);
+        res.status(500).json({ message: 'Server error', error: error.message });
+    }
+});
+
+// Verify OTP & Login
+router.post('/login', async (req, res) => {
+    const { email, otp, nickname } = req.body;
+
+    try {
+        const user = await User.findOne({ email });
+
+        if (!user) {
+            return res.status(400).json({ message: 'User not found' });
+        }
+
+        if (!user.otp || !user.otpExpires) {
+            return res.status(400).json({ message: 'No OTP requested' });
+        }
+
+        if (user.otp !== otp) {
+            return res.status(400).json({ message: 'Invalid OTP' });
+        }
+
+        if (user.otpExpires < Date.now()) {
+            return res.status(400).json({ message: 'OTP expired' });
+        }
+
+        // Update user details
+        if (nickname) {
+            user.nickname = nickname;
+        }
+        user.lastUpdated = new Date();
+
+        // Clear OTP
+        user.otp = undefined;
+        user.otpExpires = undefined;
+        await user.save();
 
         res.status(200).json(user);
     } catch (error) {
-        console.error('Error syncing user:', error);
+        console.error('Error logging in:', error);
         res.status(500).json({ message: 'Server error' });
     }
 });
 
 // Get User
-router.get('/:auth0Id', async (req, res) => {
+router.get('/:email', async (req, res) => {
     try {
-        const user = await User.findOne({ auth0Id: req.params.auth0Id });
+        const user = await User.findOne({ email: req.params.email });
         if (!user) return res.status(404).json({ message: 'User not found' });
         res.json(user);
     } catch (error) {
@@ -44,19 +112,15 @@ router.get('/:auth0Id', async (req, res) => {
     }
 });
 
-const axios = require('axios');
-
-// ... (existing imports)
-
 // Add to Watchlist
-router.post('/:auth0Id/watchlist', async (req, res) => {
+router.post('/:email/watchlist', async (req, res) => {
     const { movie, movieId } = req.body;
     const id = movieId || movie?.id;
 
     if (!id) return res.status(400).json({ message: 'Movie ID required' });
 
     try {
-        const user = await User.findOne({ auth0Id: req.params.auth0Id });
+        const user = await User.findOne({ email: req.params.email });
         if (!user) return res.status(404).json({ message: 'User not found' });
 
         // Check if movie already exists
@@ -85,8 +149,7 @@ router.post('/:auth0Id/watchlist', async (req, res) => {
                     overview: m.overview
                 };
             } catch (tmdbError) {
-                console.error('Error fetching from TMDB:', tmdbError.message);
-                // Fallback to provided movie object if TMDB fetch fails
+                console.error('Error fetching from TMDB:', tmdbError.response?.data || tmdbError.message);
                 if (!movieData) {
                     return res.status(500).json({ message: 'Failed to fetch movie details' });
                 }
@@ -107,9 +170,9 @@ router.post('/:auth0Id/watchlist', async (req, res) => {
 });
 
 // Remove from Watchlist
-router.delete('/:auth0Id/watchlist/:movieId', async (req, res) => {
+router.delete('/:email/watchlist/:movieId', async (req, res) => {
     try {
-        const user = await User.findOne({ auth0Id: req.params.auth0Id });
+        const user = await User.findOne({ email: req.params.email });
         if (!user) return res.status(404).json({ message: 'User not found' });
 
         user.watchlist = user.watchlist.filter(m => m.id !== parseInt(req.params.movieId));

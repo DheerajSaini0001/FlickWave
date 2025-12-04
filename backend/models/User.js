@@ -12,11 +12,14 @@ const MovieSchema = new mongoose.Schema({
 });
 
 const UserSchema = new mongoose.Schema({
-    auth0Id: { type: String, required: true, unique: true },
-    email: { type: String, required: true },
+    email: { type: String, required: true, unique: true },
+    otp: String,
+    otpExpires: Date,
     name: String,
     picture: String,
-    watchlist: [MovieSchema],
+    nickname: String,
+    lastUpdated: Date,
+    watchlist: [MovieSchema], // Assuming WatchlistSchema refers to MovieSchema for syntactic correctness
     createdAt: { type: Date, default: Date.now }
 });
 
