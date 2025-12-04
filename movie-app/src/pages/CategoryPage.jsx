@@ -7,9 +7,14 @@ import {
 import MovieCard from '../components/MovieCard';
 import Loader from '../components/Loader';
 import { motion, AnimatePresence } from 'framer-motion';
+// 1. Import useTheme
+import { useTheme } from '../context/ThemeContext';
 
 const CategoryPage = () => {
-    const { type, category } = useParams(); // type: 'movie' or 'tv', category: 'popular', 'top-rated', etc.
+    // 2. Access darkMode state
+    const { darkMode } = useTheme();
+    
+    const { type, category } = useParams();
     const [items, setItems] = useState([]);
     const [loading, setLoading] = useState(true);
     const [title, setTitle] = useState('');
@@ -80,35 +85,45 @@ const CategoryPage = () => {
     if (loading) return <Loader />;
 
     return (
-        <div className="container mx-auto px-6 py-8 pt-28 min-h-screen">
-            <motion.div
-                initial={{ opacity: 0, y: -20 }}
-                animate={{ opacity: 1, y: 0 }}
-                className="mb-12"
-            >
-                <h2 className="text-3xl md:text-4xl font-bold text-gray-900 dark:text-white mb-2 border-l-4 border-red-600 pl-4">
-                    {title}
-                </h2>
-            </motion.div>
+        // 3. Wrapper Div: Handles full-screen background color
+        <div className={`min-h-screen pt-28 transition-colors duration-300 ${
+            darkMode ? "bg-[#0f1014]" : "bg-gray-50"
+        }`}>
+            {/* Inner Container: Handles centering and margins */}
+            <div className="container mx-auto px-6 py-8">
+                <motion.div
+                    initial={{ opacity: 0, y: -20 }}
+                    animate={{ opacity: 1, y: 0 }}
+                    className="mb-12"
+                >
+                    {/* 4. Dynamic Text Color for Heading */}
+                    <h2 className={`text-3xl md:text-4xl font-bold mb-2 border-l-4 border-red-600 pl-4 transition-colors duration-300 ${
+                        darkMode ? "text-white" : "text-gray-900"
+                    }`}>
+                        {title}
+                    </h2>
+                </motion.div>
 
-            <motion.div
-                layout
-                className="grid grid-cols-3 sm:grid-cols-4 md:grid-cols-5 lg:grid-cols-6 gap-6"
-            >
-                <AnimatePresence>
-                    {items.map((item, index) => (
-                        <motion.div
-                            key={item.id}
-                            layout
-                            initial={{ opacity: 0, scale: 0.9 }}
-                            animate={{ opacity: 1, scale: 1 }}
-                            transition={{ duration: 0.3, delay: index * 0.05 }}
-                        >
-                            <MovieCard movie={item} />
-                        </motion.div>
-                    ))}
-                </AnimatePresence>
-            </motion.div>
+                <motion.div
+                    layout
+                    className="grid grid-cols-3 sm:grid-cols-4 md:grid-cols-5 lg:grid-cols-6 gap-6"
+                >
+                    <AnimatePresence>
+                        {items.map((item, index) => (
+                            <motion.div
+                                key={item.id}
+                                layout
+                                initial={{ opacity: 0, scale: 0.9 }}
+                                animate={{ opacity: 1, scale: 1 }}
+                                transition={{ duration: 0.3, delay: index * 0.05 }}
+                            >
+                                {/* MovieCard will handle its own dark mode via context */}
+                                <MovieCard movie={item} />
+                            </motion.div>
+                        ))}
+                    </AnimatePresence>
+                </motion.div>
+            </div>
         </div>
     );
 };

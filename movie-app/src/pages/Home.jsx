@@ -7,8 +7,13 @@ import { motion, useScroll, useTransform } from 'framer-motion';
 import { useWatchlist } from '../context/WatchlistContext';
 import { useAuth } from '../auth/AuthProvider';
 import ConfirmModal from '../components/ConfirmModal';
+// 1. Import useTheme
+import { useTheme } from '../context/ThemeContext';
 
 const Home = () => {
+    // 2. Access darkMode state
+    const { darkMode } = useTheme();
+    
     const [trending, setTrending] = useState([]);
     const [popular, setPopular] = useState([]);
     const [topRated, setTopRated] = useState([]);
@@ -74,7 +79,8 @@ const Home = () => {
     };
 
     return (
-        <div className="pb-10">
+        // 3. Main Container Background
+        <div className={`pb-10 transition-colors duration-300 ${darkMode ? "bg-[#0f1014]" : "bg-gray-50"}`}>
             {heroMovie && (
                 <ConfirmModal
                     isOpen={modalConfig.isOpen}
@@ -97,8 +103,20 @@ const Home = () => {
                             y,
                         }}
                     >
-                        <div className="absolute inset-0 bg-gradient-to-t from-[#0f1014] via-[#0f1014]/40 to-transparent" />
-                        <div className="absolute inset-0 bg-gradient-to-r from-[#0f1014] via-[#0f1014]/60 to-transparent" />
+                        {/* 4. Hero Gradients:
+                            Dark Mode: Fade to black.
+                            Light Mode: Fade to gray-50 (fog effect) to ensure seamless blend with page body.
+                        */}
+                        <div className={`absolute inset-0 bg-gradient-to-t to-transparent transition-colors duration-500 ${
+                            darkMode 
+                                ? "from-[#0f1014] via-[#0f1014]/40" 
+                                : "from-gray-50 via-gray-50/60"
+                        }`} />
+                        <div className={`absolute inset-0 bg-gradient-to-r to-transparent transition-colors duration-500 ${
+                            darkMode 
+                                ? "from-[#0f1014] via-[#0f1014]/60" 
+                                : "from-gray-50 via-gray-50/80"
+                        }`} />
                     </motion.div>
 
                     <motion.div
@@ -114,7 +132,11 @@ const Home = () => {
                             <span className="bg-red-600 text-white text-xs font-bold px-3 py-1 rounded uppercase tracking-widest shadow-lg shadow-red-600/20">
                                 Trending #1
                             </span>
-                            <span className="text-gray-300 text-sm font-medium border border-white/20 px-2 py-1 rounded backdrop-blur-sm">
+                            <span className={`text-sm font-medium border px-2 py-1 rounded backdrop-blur-sm ${
+                                darkMode 
+                                    ? "text-gray-300 border-white/20" 
+                                    : "text-gray-800 border-black/20"
+                            }`}>
                                 {heroMovie.release_date ? new Date(heroMovie.release_date).getFullYear() : 'N/A'}
                             </span>
                             <span className="text-yellow-400 text-sm font-bold flex items-center gap-1">
@@ -122,11 +144,14 @@ const Home = () => {
                             </span>
                         </motion.div>
 
+                        {/* 5. Typography: White in dark mode, Dark Gray in light mode (to sit on top of the "fog") */}
                         <motion.h1
                             initial={{ opacity: 0, y: 30 }}
                             animate={{ opacity: 1, y: 0 }}
                             transition={{ delay: 0.4, duration: 0.8 }}
-                            className="text-5xl md:text-7xl lg:text-8xl font-black text-white mb-6 leading-tight drop-shadow-2xl tracking-tight"
+                            className={`text-5xl md:text-7xl lg:text-8xl font-black mb-6 leading-tight drop-shadow-2xl tracking-tight transition-colors duration-300 ${
+                                darkMode ? "text-white" : "text-gray-900"
+                            }`}
                         >
                             {heroMovie.title}
                         </motion.h1>
@@ -135,7 +160,9 @@ const Home = () => {
                             initial={{ opacity: 0, y: 20 }}
                             animate={{ opacity: 1, y: 0 }}
                             transition={{ delay: 0.6, duration: 0.8 }}
-                            className="text-lg md:text-xl text-gray-300 mb-10 line-clamp-3 leading-relaxed max-w-2xl drop-shadow-md"
+                            className={`text-lg md:text-xl mb-10 line-clamp-3 leading-relaxed max-w-2xl drop-shadow-md transition-colors duration-300 ${
+                                darkMode ? "text-gray-300" : "text-gray-700"
+                            }`}
                         >
                             {heroMovie.overview}
                         </motion.p>
@@ -156,11 +183,17 @@ const Home = () => {
                                     View Details
                                 </motion.button>
                             </Link>
+                            
+                            {/* 6. Secondary Button: Adjusts glass effect for light/dark */}
                             <motion.button
-                                whileHover={{ scale: 1.05, backgroundColor: "rgba(255,255,255,0.2)" }}
+                                whileHover={{ scale: 1.05, backgroundColor: darkMode ? "rgba(255,255,255,0.2)" : "rgba(0,0,0,0.1)" }}
                                 whileTap={{ scale: 0.95 }}
                                 onClick={handleWatchlistClick}
-                                className="bg-white/10 backdrop-blur-md text-white border border-white/20 px-8 py-4 rounded-full font-bold transition-colors shadow-lg flex items-center gap-3 text-lg"
+                                className={`backdrop-blur-md border px-8 py-4 rounded-full font-bold transition-colors shadow-lg flex items-center gap-3 text-lg ${
+                                    darkMode 
+                                        ? "bg-white/10 text-white border-white/20" 
+                                        : "bg-black/5 text-gray-900 border-black/10"
+                                }`}
                             >
                                 {inWatchlist ? (
                                     <>
@@ -180,6 +213,7 @@ const Home = () => {
             )}
 
             <div className="relative z-10 space-y-4">
+                {/* Note: MovieRow likely needs no changes if it inherits colors or handles them internally */}
                 <MovieRow title="Trending Now" movies={trending} viewAllPath="/category/movie/trending" />
                 <MovieRow title="Popular Movies" movies={popular} viewAllPath="/category/movie/popular" />
                 <MovieRow title="Top Rated" movies={topRated} viewAllPath="/category/movie/top-rated" />

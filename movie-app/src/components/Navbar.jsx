@@ -54,11 +54,11 @@ const Navbar = () => {
                 scrolled
                     ? " backdrop-blur-xl shadow-lg"
                     
-                    : "bg-transparent"
+                    : ""
             )}
 
         >
-            <div className={` px-6 py-4 flex justify-between items-center  ${darkMode ? "bg-[#0f1014]/80" : "bg-white/80"}`}>
+            <div className={` px-6 py-[10px] flex justify-between items-center  ${darkMode ? "bg-[#0f1014]/8" : "bg-white/80"}`}>
                 <Link to="/" className="text-3xl font-extrabold tracking-tight relative z-50">
                     <span className="bg-clip-text text-transparent bg-gradient-to-r from-red-600 to-orange-600 drop-shadow-sm">
                         FlickWave
