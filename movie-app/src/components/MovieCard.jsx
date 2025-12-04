@@ -21,9 +21,8 @@ const MovieCard = ({ movie }) => {
         <Link to={linkPath} className="block h-full relative group perspective-1000">
             <motion.div
                 // 3. Conditional Background color for the card container
-                className={`relative rounded-2xl overflow-hidden shadow-xl h-full transform-gpu transition-colors duration-300 ${
-                    darkMode ? "bg-[#1a1c24]" : "bg-white"
-                }`}
+                className={`relative rounded-2xl overflow-hidden shadow-xl h-full transform-gpu transition-colors duration-300 ${darkMode ? "bg-[#1a1c24]" : "bg-white"
+                    }`}
                 whileHover={{
                     scale: 1.05,
                     y: -10,
@@ -49,11 +48,10 @@ const MovieCard = ({ movie }) => {
                         Dark Mode: Dark gradient for mood.
                         Light Mode: Lighter or no top gradient to keep it crisp. 
                     */}
-                    <div className={`absolute inset-0 bg-gradient-to-t transition-opacity duration-300 ${
-                        darkMode 
-                            ? "from-black via-black/40 to-transparent opacity-60 group-hover:opacity-80" 
-                            : "from-transparent via-transparent to-transparent opacity-0"
-                    }`} />
+                    <div className={`absolute inset-0 bg-gradient-to-t transition-opacity duration-300 ${darkMode
+                        ? "from-black via-black/40 to-transparent opacity-60 group-hover:opacity-80"
+                        : "from-transparent via-transparent to-transparent opacity-0"
+                        }`} />
 
                     {/* Hover Content - Play Icon */}
                     <div className="absolute inset-0 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-all duration-300 scale-50 group-hover:scale-100 z-10">
@@ -68,11 +66,10 @@ const MovieCard = ({ movie }) => {
                         Dark Mode: Dark glassmorphism.
                         Light Mode: White glassmorphism with dark text.
                     */}
-                    <div className={`absolute top-3 right-3 backdrop-blur-md px-2 py-1 rounded-lg flex items-center gap-1 border transition-colors duration-300 ${
-                        darkMode 
-                            ? "bg-black/60 border-white/10" 
-                            : "bg-white/70 border-gray-200 text-gray-900"
-                    }`}>
+                    <div className={`absolute top-3 right-3 backdrop-blur-md px-2 py-1 rounded-lg flex items-center gap-1 border transition-colors duration-300 ${darkMode
+                        ? "bg-black/60 border-white/10"
+                        : "bg-white/70 border-gray-200 text-gray-900"
+                        }`}>
                         <span className="text-yellow-400 text-xs">★</span>
                         <span className={`text-xs font-bold ${darkMode ? "text-white" : "text-gray-900"}`}>
                             {voteAverage}
@@ -83,25 +80,21 @@ const MovieCard = ({ movie }) => {
                 {/* Bottom Info Section (Glassmorphism) 
                    Logic: The gradient at the bottom needs to fade into the card's background color.
                 */}
-                <div className={`absolute bottom-0 left-0 right-0 p-4 pt-12 bg-gradient-to-t transition-colors duration-300 ${
-                    darkMode 
-                        ? "from-[#1a1c24] via-[#1a1c24]/90 to-transparent" 
+                <div className={`absolute bottom-0 left-0 right-0 p-2 md:p-4 pt-6 md:pt-12 bg-gradient-to-t transition-colors duration-300 ${darkMode
+                        ? "from-[#1a1c24] via-[#1a1c24]/90 to-transparent"
                         : "from-white via-white/90 to-transparent"
-                }`}>
-                    <h3 className={`text-lg font-bold leading-tight mb-1 line-clamp-1 group-hover:text-red-500 transition-colors duration-300 ${
-                        darkMode ? "text-white" : "text-gray-900"
                     }`}>
+                    <h3 className={`text-xs md:text-lg font-bold leading-tight mb-0.5 md:mb-1 line-clamp-1 group-hover:text-red-500 transition-colors duration-300 ${darkMode ? "text-white" : "text-gray-900"
+                        }`}>
                         {title}
                     </h3>
-                    <div className={`flex justify-between items-center text-sm ${
-                        darkMode ? "text-gray-300" : "text-gray-600"
-                    }`}>
-                        <span>{releaseDate ? new Date(releaseDate).getFullYear() : 'N/A'}</span>
-                        <span className={`text-xs px-2 py-0.5 rounded-full border ${
-                            darkMode 
-                                ? "border-white/20 bg-white/5" 
-                                : "border-gray-300 bg-gray-100"
+                    <div className={`flex justify-between items-center text-[10px] md:text-sm ${darkMode ? "text-gray-300" : "text-gray-600"
                         }`}>
+                        <span>{releaseDate ? new Date(releaseDate).getFullYear() : 'N/A'}</span>
+                        <span className={`text-[8px] md:text-xs px-1 md:px-2 py-0.5 rounded-full border ${darkMode
+                                ? "border-white/20 bg-white/5"
+                                : "border-gray-300 bg-gray-100"
+                            }`}>
                             {movie.first_air_date ? 'TV' : 'Movie'}
                         </span>
                     </div>
