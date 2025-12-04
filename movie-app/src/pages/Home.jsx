@@ -115,7 +115,7 @@ const Home = () => {
                         <div className={`absolute inset-0 bg-gradient-to-r to-transparent transition-colors duration-500 ${
                             darkMode 
                                 ? "from-[#0f1014] via-[#0f1014]/60" 
-                                : "from-gray-50 via-gray-50/80"
+      : "from-gray-50 via-gray-50/80"
                         }`} />
                     </motion.div>
 
