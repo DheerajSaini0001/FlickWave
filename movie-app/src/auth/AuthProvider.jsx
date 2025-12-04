@@ -1,6 +1,7 @@
 import React, { createContext, useContext, useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import axios from 'axios';
+import { API_URL } from '../api/backend';
 
 const AuthContext = createContext();
 
@@ -21,7 +22,7 @@ export const AuthProvider = ({ children }) => {
 
     const sendOtp = async (email) => {
         try {
-            await axios.post(`${import.meta.env.VITE_BACKEND_URL}/api/users/send-otp`, { email });
+            await axios.post(`${API_URL}/users/send-otp`, { email });
             return true;
         } catch (error) {
             console.error("Failed to send OTP:", error);
@@ -31,7 +32,7 @@ export const AuthProvider = ({ children }) => {
 
     const login = async (email, otp, nickname) => {
         try {
-            const res = await axios.post(`${import.meta.env.VITE_BACKEND_URL}/api/users/login`, {
+            const res = await axios.post(`${API_URL}/users/login`, {
                 email,
                 otp,
                 nickname

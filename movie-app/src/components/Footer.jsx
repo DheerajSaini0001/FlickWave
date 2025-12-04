@@ -63,10 +63,7 @@ const Footer = () => {
                     }`}>
                     Made with <span className="text-red-500 animate-pulse">❤️</span> by Dheeraj Saini
                 </p>
-                <p className={`text-xs mt-2 transition-colors duration-300 ${darkMode ? "text-gray-700" : "text-gray-400"
-                    }`}>
-                    Powered by <a href="https://www.themoviedb.org/" target="_blank" rel="noopener noreferrer" className="text-blue-500/60 hover:text-blue-500 hover:underline transition-colors">TMDb</a>
-                </p>
+                
             </div>
         </footer>
     );
