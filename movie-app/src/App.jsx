@@ -7,6 +7,9 @@ import MovieDetails from './pages/MovieDetails';
 import SearchResults from './pages/SearchResults';
 import Watchlist from './pages/Watchlist';
 import Profile from './pages/Profile';
+import Login from './pages/Login';
+import Browse from './pages/Browse';
+import CategoryPage from './pages/CategoryPage';
 import ProtectedRoute from './auth/ProtectedRoute';
 
 function App() {
@@ -18,6 +21,10 @@ function App() {
           <Route path="/" element={<Home />} />
           <Route path="/movie/:id" element={<MovieDetails />} />
           <Route path="/search" element={<SearchResults />} />
+          <Route path="/login" element={<Login />} />
+          <Route path="/movies" element={<Browse type="movie" />} />
+          <Route path="/tv-shows" element={<Browse type="tv" />} />
+          <Route path="/category/:type/:category" element={<CategoryPage />} />
 
           <Route path="/watchlist" element={
             <ProtectedRoute>

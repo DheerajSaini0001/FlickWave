@@ -1,26 +1,65 @@
-import React from 'react';
-import { Auth0Provider } from "@auth0/auth0-react";
-import { useNavigate } from "react-router-dom";
+import React, { createContext, useContext, useState, useEffect } from 'react';
+import { useNavigate } from 'react-router-dom';
+import axios from 'axios';
 
-const AuthProvider = ({ children }) => {
+const AuthContext = createContext();
+
+export const AuthProvider = ({ children }) => {
+    const [user, setUser] = useState(null);
+    const [isAuthenticated, setIsAuthenticated] = useState(false);
+    const [loading, setLoading] = useState(true);
     const navigate = useNavigate();
 
-    const onRedirectCallback = (appState) => {
-        navigate(appState?.returnTo || window.location.pathname);
+    useEffect(() => {
+        const storedUser = localStorage.getItem('flickwave_user');
+        if (storedUser) {
+            setUser(JSON.parse(storedUser));
+            setIsAuthenticated(true);
+        }
+        setLoading(false);
+    }, []);
+
+    const sendOtp = async (email) => {
+        try {
+            await axios.post(`${import.meta.env.VITE_BACKEND_URL}/api/users/send-otp`, { email });
+            return true;
+        } catch (error) {
+            console.error("Failed to send OTP:", error);
+            return false;
+        }
+    };
+
+    const login = async (email, otp, nickname) => {
+        try {
+            const res = await axios.post(`${import.meta.env.VITE_BACKEND_URL}/api/users/login`, {
+                email,
+                otp,
+                nickname
+            });
+
+            const userData = res.data;
+            setUser(userData);
+            setIsAuthenticated(true);
+            localStorage.setItem('flickwave_user', JSON.stringify(userData));
+            return true;
+        } catch (error) {
+            console.error("Login failed:", error);
+            return false;
+        }
+    };
+
+    const logout = () => {
+        setUser(null);
+        setIsAuthenticated(false);
+        localStorage.removeItem('flickwave_user');
+        navigate('/');
     };
 
     return (
-        <Auth0Provider
-            domain={import.meta.env.VITE_AUTH0_DOMAIN}
-            clientId={import.meta.env.VITE_AUTH0_CLIENT_ID}
-            authorizationParams={{
-                redirect_uri: import.meta.env.VITE_AUTH0_CALLBACK_URL
-            }}
-            onRedirectCallback={onRedirectCallback}
-        >
+        <AuthContext.Provider value={{ user, isAuthenticated, login, logout, sendOtp, loading }}>
             {children}
-        </Auth0Provider>
+        </AuthContext.Provider>
     );
 };
 
-export default AuthProvider;
+export const useAuth = () => useContext(AuthContext);

@@ -15,4 +15,10 @@ export const getUpcomingMovies = () => tmdb.get('/movie/upcoming');
 export const getMovieDetails = (id) => tmdb.get(`/movie/${id}?append_to_response=videos,credits,recommendations`);
 export const searchMovies = (query) => tmdb.get(`/search/movie`, { params: { query } });
 
+// TV Shows
+export const getTrendingTV = () => tmdb.get('/trending/tv/day');
+export const getPopularTV = () => tmdb.get('/tv/popular');
+export const getTopRatedTV = () => tmdb.get('/tv/top_rated');
+export const getOnTheAirTV = () => tmdb.get('/tv/on_the_air');
+
 export default tmdb;

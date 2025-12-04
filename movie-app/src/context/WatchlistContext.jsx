@@ -1,36 +1,26 @@
-import React, { createContext, useState, useEffect, useContext } from 'react';
-import { useAuth0 } from '@auth0/auth0-react';
-import { syncUser, getUserWatchlist, addToWatchlistApi, removeFromWatchlistApi } from '../api/backend';
+import React, { createContext, useContext, useState, useEffect } from 'react';
+import { useAuth } from '../auth/AuthProvider';
+import { getUserWatchlist, addToWatchlist as apiAddToWatchlist, removeFromWatchlist as apiRemoveFromWatchlist } from '../api/backend';
 
 const WatchlistContext = createContext();
 
 export const useWatchlist = () => useContext(WatchlistContext);
 
 export const WatchlistProvider = ({ children }) => {
-    const { user, isAuthenticated } = useAuth0();
     const [watchlist, setWatchlist] = useState([]);
+    const { user, isAuthenticated } = useAuth();
 
     useEffect(() => {
-        const initializeUser = async () => {
-            if (isAuthenticated && user) {
-                try {
-                    // Sync user with backend
-                    await syncUser(user);
-                    // Fetch user's watchlist
-                    const serverWatchlist = await getUserWatchlist(user.sub);
-                    setWatchlist(serverWatchlist);
-                } catch (error) {
-                    console.error("Failed to sync with backend:", error);
-                    // Fallback to localStorage if backend fails (optional, keeping it simple for now)
-                    const stored = localStorage.getItem(`watchlist_${user.sub}`);
-                    if (stored) setWatchlist(JSON.parse(stored));
+        if (isAuthenticated && user) {
+            // Fetch user's watchlist
+            getUserWatchlist(user.email).then(data => {
+                if (data) {
+                    setWatchlist(data);
                 }
-            } else {
-                setWatchlist([]);
-            }
-        };
-
-        initializeUser();
+            }).catch(err => console.error(err));
+        } else {
+            setWatchlist([]);
+        }
     }, [isAuthenticated, user]);
 
     const addToWatchlist = async (movie) => {
@@ -42,7 +32,7 @@ export const WatchlistProvider = ({ children }) => {
         setWatchlist(updated);
 
         try {
-            await addToWatchlistApi(user.sub, movie);
+            await apiAddToWatchlist(user.email, movie);
         } catch (error) {
             console.error("Failed to add to watchlist on server:", error);
             // Revert on failure
@@ -59,7 +49,7 @@ export const WatchlistProvider = ({ children }) => {
         setWatchlist(updated);
 
         try {
-            await removeFromWatchlistApi(user.sub, id);
+            await apiRemoveFromWatchlist(user.email, id);
         } catch (error) {
             console.error("Failed to remove from watchlist on server:", error);
             // Revert on failure

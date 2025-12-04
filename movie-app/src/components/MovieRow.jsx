@@ -1,13 +1,15 @@
 import React, { useRef } from 'react';
 import MovieCard from './MovieCard';
+import { motion } from 'framer-motion';
+import { Link } from 'react-router-dom';
 
-const MovieRow = ({ title, movies }) => {
+const MovieRow = ({ title, movies, viewAllPath }) => {
     const rowRef = useRef(null);
 
     const scroll = (direction) => {
         const { current } = rowRef;
         if (current) {
-            const scrollAmount = direction === 'left' ? -500 : 500;
+            const scrollAmount = direction === 'left' ? -800 : 800;
             current.scrollBy({ left: scrollAmount, behavior: 'smooth' });
         }
     };
@@ -15,35 +17,55 @@ const MovieRow = ({ title, movies }) => {
     if (!movies || movies.length === 0) return null;
 
     return (
-        <div className="my-8 px-4 container mx-auto">
-            <h2 className="text-2xl font-bold text-gray-900 dark:text-white mb-4 border-l-4 border-red-600 pl-3">{title}</h2>
+        <div className="my-12 px-6 container mx-auto">
+            <motion.h2
+                initial={{ opacity: 0, x: -20 }}
+                whileInView={{ opacity: 1, x: 0 }}
+                transition={{ duration: 0.5 }}
+                className="text-2xl md:text-3xl font-bold text-white mb-6 border-l-4 border-red-600 pl-4 flex items-center gap-2"
+            >
+                {title}
+                {viewAllPath && (
+                    <Link to={viewAllPath} className="text-sm font-normal text-gray-500 ml-auto cursor-pointer hover:text-red-500 transition-colors">
+                        View All &rarr;
+                    </Link>
+                )}
+            </motion.h2>
+
             <div className="relative group">
                 <button
                     onClick={() => scroll('left')}
-                    className="absolute left-0 top-1/2 -translate-y-1/2 z-10 bg-black/60 hover:bg-red-600 text-white p-3 rounded-full opacity-0 group-hover:opacity-100 transition-all duration-300 transform -translate-x-1/2"
+                    className="absolute left-0 top-1/2 -translate-y-1/2 z-20 bg-black/50 hover:bg-red-600 text-white p-4 rounded-full opacity-0 group-hover:opacity-100 transition-all duration-300 transform -translate-x-1/2 backdrop-blur-sm border border-white/10"
                     aria-label="Scroll Left"
                 >
-                    &#10094;
+                    <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 19l-7-7 7-7" /></svg>
                 </button>
 
                 <div
                     ref={rowRef}
-                    className="flex space-x-4 overflow-x-auto scrollbar-hide py-4 px-2 scroll-smooth"
+                    className="flex space-x-6 overflow-x-auto scrollbar-hide py-8 px-2 scroll-smooth snap-x snap-mandatory"
                     style={{ scrollbarWidth: 'none', msOverflowStyle: 'none' }}
                 >
-                    {movies.map((movie) => (
-                        <div key={movie.id} className="min-w-[160px] md:min-w-[200px] flex-shrink-0">
+                    {movies.map((movie, index) => (
+                        <motion.div
+                            key={movie.id}
+                            className="min-w-[140px] md:min-w-[180px] flex-shrink-0 snap-start"
+                            initial={{ opacity: 0, y: 20 }}
+                            whileInView={{ opacity: 1, y: 0 }}
+                            transition={{ duration: 0.5, delay: index * 0.05 }}
+                            viewport={{ once: true }}
+                        >
                             <MovieCard movie={movie} />
-                        </div>
+                        </motion.div>
                     ))}
                 </div>
 
                 <button
                     onClick={() => scroll('right')}
-                    className="absolute right-0 top-1/2 -translate-y-1/2 z-10 bg-black/60 hover:bg-red-600 text-white p-3 rounded-full opacity-0 group-hover:opacity-100 transition-all duration-300 transform translate-x-1/2"
+                    className="absolute right-0 top-1/2 -translate-y-1/2 z-20 bg-black/50 hover:bg-red-600 text-white p-4 rounded-full opacity-0 group-hover:opacity-100 transition-all duration-300 transform translate-x-1/2 backdrop-blur-sm border border-white/10"
                     aria-label="Scroll Right"
                 >
-                    &#10095;
+                    <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" /></svg>
                 </button>
             </div>
         </div>
