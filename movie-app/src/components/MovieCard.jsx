@@ -1,8 +1,13 @@
 import React from 'react';
 import { Link } from 'react-router-dom';
 import { motion } from 'framer-motion';
+// 1. Import the theme hook
+import { useTheme } from '../context/ThemeContext';
 
 const MovieCard = ({ movie }) => {
+    // 2. Access darkMode state
+    const { darkMode } = useTheme();
+
     const posterUrl = movie.poster_path
         ? `https://image.tmdb.org/t/p/w500${movie.poster_path}`
         : 'https://via.placeholder.com/500x750?text=No+Image';
@@ -15,12 +20,16 @@ const MovieCard = ({ movie }) => {
     return (
         <Link to={linkPath} className="block h-full relative group perspective-1000">
             <motion.div
-                className="relative rounded-2xl overflow-hidden bg-[#1a1c24] shadow-xl h-full transform-gpu"
+                // 3. Conditional Background color for the card container
+                className={`relative rounded-2xl overflow-hidden shadow-xl h-full transform-gpu transition-colors duration-300 ${
+                    darkMode ? "bg-[#1a1c24]" : "bg-white"
+                }`}
                 whileHover={{
                     scale: 1.05,
                     y: -10,
                     rotateX: 5,
                     rotateY: 5,
+                    // Keep the red glow in both modes for branding, or adjust opacity if needed
                     boxShadow: "0 25px 50px -12px rgba(220, 38, 38, 0.5)"
                 }}
                 transition={{ type: "spring", stiffness: 400, damping: 12 }}
@@ -36,11 +45,18 @@ const MovieCard = ({ movie }) => {
                         transition={{ duration: 0.6, ease: "easeOut" }}
                     />
 
-                    {/* Gradient Overlay */}
-                    <div className="absolute inset-0 bg-gradient-to-t from-black via-black/40 to-transparent opacity-60 group-hover:opacity-80 transition-opacity duration-300" />
+                    {/* Gradient Overlay - Logic:
+                        Dark Mode: Dark gradient for mood.
+                        Light Mode: Lighter or no top gradient to keep it crisp. 
+                    */}
+                    <div className={`absolute inset-0 bg-gradient-to-t transition-opacity duration-300 ${
+                        darkMode 
+                            ? "from-black via-black/40 to-transparent opacity-60 group-hover:opacity-80" 
+                            : "from-transparent via-transparent to-transparent opacity-0"
+                    }`} />
 
                     {/* Hover Content - Play Icon */}
-                    <div className="absolute inset-0 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-all duration-300 scale-50 group-hover:scale-100">
+                    <div className="absolute inset-0 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-all duration-300 scale-50 group-hover:scale-100 z-10">
                         <div className="w-14 h-14 bg-red-600/90 backdrop-blur-sm rounded-full flex items-center justify-center shadow-[0_0_20px_rgba(220,38,38,0.6)]">
                             <svg className="w-6 h-6 text-white ml-1" fill="currentColor" viewBox="0 0 24 24">
                                 <path d="M8 5v14l11-7z" />
@@ -48,21 +64,44 @@ const MovieCard = ({ movie }) => {
                         </div>
                     </div>
 
-                    {/* Top Right Rating Badge */}
-                    <div className="absolute top-3 right-3 bg-black/60 backdrop-blur-md border border-white/10 px-2 py-1 rounded-lg flex items-center gap-1">
+                    {/* Top Right Rating Badge - Logic:
+                        Dark Mode: Dark glassmorphism.
+                        Light Mode: White glassmorphism with dark text.
+                    */}
+                    <div className={`absolute top-3 right-3 backdrop-blur-md px-2 py-1 rounded-lg flex items-center gap-1 border transition-colors duration-300 ${
+                        darkMode 
+                            ? "bg-black/60 border-white/10" 
+                            : "bg-white/70 border-gray-200 text-gray-900"
+                    }`}>
                         <span className="text-yellow-400 text-xs">★</span>
-                        <span className="text-white text-xs font-bold">{voteAverage}</span>
+                        <span className={`text-xs font-bold ${darkMode ? "text-white" : "text-gray-900"}`}>
+                            {voteAverage}
+                        </span>
                     </div>
                 </div>
 
-                {/* Bottom Info Section (Glassmorphism) */}
-                <div className="absolute bottom-0 left-0 right-0 p-4 bg-gradient-to-t from-black/95 via-black/80 to-transparent pt-12">
-                    <h3 className="text-lg font-bold text-white leading-tight mb-1 line-clamp-1 group-hover:text-red-500 transition-colors duration-300">
+                {/* Bottom Info Section (Glassmorphism) 
+                   Logic: The gradient at the bottom needs to fade into the card's background color.
+                */}
+                <div className={`absolute bottom-0 left-0 right-0 p-4 pt-12 bg-gradient-to-t transition-colors duration-300 ${
+                    darkMode 
+                        ? "from-[#1a1c24] via-[#1a1c24]/90 to-transparent" 
+                        : "from-white via-white/90 to-transparent"
+                }`}>
+                    <h3 className={`text-lg font-bold leading-tight mb-1 line-clamp-1 group-hover:text-red-500 transition-colors duration-300 ${
+                        darkMode ? "text-white" : "text-gray-900"
+                    }`}>
                         {title}
                     </h3>
-                    <div className="flex justify-between items-center text-sm text-gray-300">
+                    <div className={`flex justify-between items-center text-sm ${
+                        darkMode ? "text-gray-300" : "text-gray-600"
+                    }`}>
                         <span>{releaseDate ? new Date(releaseDate).getFullYear() : 'N/A'}</span>
-                        <span className="text-xs border border-white/20 px-2 py-0.5 rounded-full bg-white/5">
+                        <span className={`text-xs px-2 py-0.5 rounded-full border ${
+                            darkMode 
+                                ? "border-white/20 bg-white/5" 
+                                : "border-gray-300 bg-gray-100"
+                        }`}>
                             {movie.first_air_date ? 'TV' : 'Movie'}
                         </span>
                     </div>
