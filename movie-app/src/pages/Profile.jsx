@@ -4,7 +4,7 @@ import Loader from '../components/Loader';
 import { motion } from 'framer-motion';
 
 const Profile = () => {
-    const { user, isAuthenticated, loading, logout } = useAuth();
+    const { user, isAuthenticated, loading } = useAuth();
 
     if (loading) {
         return <Loader />;
@@ -75,15 +75,7 @@ const Profile = () => {
                             </div>
                         </motion.div>
 
-                        <motion.button
-                            initial={{ opacity: 0, y: 20 }}
-                            animate={{ opacity: 1, y: 0 }}
-                            transition={{ delay: 0.6 }}
-                            onClick={logout}
-                            className="bg-red-600 text-white px-8 py-3 rounded-full font-bold hover:bg-red-700 transition-colors shadow-lg shadow-red-600/30"
-                        >
-                            Logout
-                        </motion.button>
+                      
                     </div>
                 </motion.div>
             </div>
