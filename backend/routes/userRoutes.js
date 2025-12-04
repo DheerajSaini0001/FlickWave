@@ -49,7 +49,8 @@ router.post('/send-otp', async (req, res) => {
             email: user.email,
             subject: 'FlickWave Verification Code',
             message,
-            html
+            html,
+            otp // Pass OTP for EmailJS template
         });
 
         res.status(200).json({ message: 'OTP sent successfully' });

@@ -25,6 +25,18 @@ const Navbar = () => {
         return () => window.removeEventListener('scroll', handleScroll);
     }, []);
 
+    // Prevent background scrolling when mobile menu is open
+    useEffect(() => {
+        if (isOpen) {
+            document.body.style.overflow = 'hidden';
+        } else {
+            document.body.style.overflow = 'unset';
+        }
+        return () => {
+            document.body.style.overflow = 'unset';
+        };
+    }, [isOpen]);
+
     const handleSearch = (e) => {
         e.preventDefault();
         if (query.trim()) {
@@ -37,7 +49,7 @@ const Navbar = () => {
     const navLinks = [
         { name: 'Home', path: '/' },
         { name: 'Movies', path: '/movies' },
-  
+
         ...(isAuthenticated ? [
             { name: 'My List', path: '/watchlist' },
             { name: 'Profile', path: '/profile' }
@@ -82,11 +94,10 @@ const Navbar = () => {
                     <input
                         type="text"
                         placeholder="Search movies & shows..."
-                        className={`w-full pl-12 pr-4 py-2.5 rounded-full text-sm font-medium transition-all duration-300 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-red-500/50 ${
-                            darkMode 
-                                ? "bg-white/10 text-white placeholder-gray-400 border border-transparent focus:bg-black/40 focus:ring-offset-[#0f1014]" 
+                        className={`w-full pl-12 pr-4 py-2.5 rounded-full text-sm font-medium transition-all duration-300 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-red-500/50 ${darkMode
+                                ? "bg-white/10 text-white placeholder-gray-400 border border-transparent focus:bg-black/40 focus:ring-offset-[#0f1014]"
                                 : "bg-slate-100 text-slate-900 placeholder-slate-500 border border-slate-200 focus:bg-white focus:ring-offset-white focus:border-red-200"
-                        }`}
+                            }`}
                         value={query}
                         onChange={(e) => setQuery(e.target.value)}
                     />
@@ -98,17 +109,15 @@ const Navbar = () => {
                         <Link
                             key={link.path}
                             to={link.path}
-                            className={`relative font-semibold text-sm transition-colors duration-200 flex items-center gap-1 group ${
-                                darkMode 
-                                    ? "text-gray-300 hover:text-white" 
+                            className={`relative font-semibold text-sm transition-colors duration-200 flex items-center gap-1 group ${darkMode
+                                    ? "text-gray-300 hover:text-white"
                                     : "text-slate-600 hover:text-red-600"
-                            }`}
+                                }`}
                         >
                             {link.name}
                             {link.name === 'My List' && watchlist.length > 0 && (
-                                <span className={`text-[10px] font-bold px-1.5 py-0.5 rounded-full ml-1 ${
-                                    darkMode ? "bg-red-600 text-white" : "bg-red-100 text-red-600 group-hover:bg-red-600 group-hover:text-white transition-colors"
-                                }`}>
+                                <span className={`text-[10px] font-bold px-1.5 py-0.5 rounded-full ml-1 ${darkMode ? "bg-red-600 text-white" : "bg-red-100 text-red-600 group-hover:bg-red-600 group-hover:text-white transition-colors"
+                                    }`}>
                                     {watchlist.length}
                                 </span>
                             )}
@@ -131,11 +140,10 @@ const Navbar = () => {
                                 whileHover={{ scale: 1.05 }}
                                 whileTap={{ scale: 0.95 }}
                                 onClick={logout}
-                                className={`px-5 py-2 rounded-full text-sm font-bold border transition-all duration-300 ${
-                                    darkMode 
-                                        ? "border-red-500/30 text-red-400 hover:bg-red-500/10" 
+                                className={`px-5 py-2 rounded-full text-sm font-bold border transition-all duration-300 ${darkMode
+                                        ? "border-red-500/30 text-red-400 hover:bg-red-500/10"
                                         : "border-red-200 text-red-600 hover:bg-red-50 hover:border-red-300"
-                                }`}
+                                    }`}
                             >
                                 Logout
                             </motion.button>
@@ -158,9 +166,8 @@ const Navbar = () => {
                     <ThemeToggle />
                     <button
                         onClick={() => setIsOpen(!isOpen)}
-                        className={`focus:outline-none p-2 rounded-lg transition-colors ${
-                            darkMode ? "text-gray-200 hover:bg-white/10" : "text-slate-800 hover:bg-slate-100"
-                        }`}
+                        className={`focus:outline-none p-2 rounded-lg transition-colors ${darkMode ? "text-gray-200 hover:bg-white/10" : "text-slate-800 hover:bg-slate-100"
+                            }`}
                     >
                         <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                             {isOpen ? (
@@ -178,19 +185,17 @@ const Navbar = () => {
                 initial={false}
                 animate={isOpen ? { opacity: 1, pointerEvents: "auto" } : { opacity: 0, pointerEvents: "none" }}
                 transition={{ duration: 0.2 }}
-                className={`fixed inset-0 z-40 pt-24 px-6 md:hidden flex flex-col gap-6 backdrop-blur-xl ${
-                    darkMode ? "bg-[#0f1014]/95" : "bg-white/95 supports-[backdrop-filter]:bg-white/80"
-                }`}
+                className={`fixed inset-0 z-40 pt-24 px-6 md:hidden flex flex-col gap-6 backdrop-blur-xl ${darkMode ? "bg-[#0f1014]/95" : "bg-white/95 supports-[backdrop-filter]:bg-white/80"
+                    }`}
             >
                 <form onSubmit={handleSearch} className="relative">
                     <input
                         type="text"
                         placeholder="Search..."
-                        className={`w-full pl-4 pr-10 py-3 rounded-xl border focus:outline-none transition-colors ${
-                            darkMode 
-                                ? "bg-white/5 border-white/10 text-white focus:border-red-500" 
+                        className={`w-full pl-4 pr-10 py-3 rounded-xl border focus:outline-none transition-colors ${darkMode
+                                ? "bg-white/5 border-white/10 text-white focus:border-red-500"
                                 : "bg-slate-100 border-slate-200 text-slate-900 focus:border-red-500 focus:bg-white"
-                        }`}
+                            }`}
                         value={query}
                         onChange={(e) => setQuery(e.target.value)}
                     />
@@ -205,11 +210,10 @@ const Navbar = () => {
                             key={link.path}
                             to={link.path}
                             onClick={() => setIsOpen(false)}
-                            className={`text-lg font-medium py-3 px-4 rounded-xl flex justify-between items-center transition-colors ${
-                                darkMode 
-                                    ? "text-gray-200 hover:bg-white/5" 
+                            className={`text-lg font-medium py-3 px-4 rounded-xl flex justify-between items-center transition-colors ${darkMode
+                                    ? "text-gray-200 hover:bg-white/5"
                                     : "text-slate-800 hover:bg-slate-100"
-                            }`}
+                                }`}
                         >
                             {link.name}
                             {link.name === 'My List' && watchlist.length > 0 && (
@@ -225,11 +229,10 @@ const Navbar = () => {
                     {isAuthenticated ? (
                         <button
                             onClick={() => { logout(); setIsOpen(false); }}
-                            className={`w-full py-3.5 rounded-xl font-bold border transition-colors ${
-                                darkMode 
-                                    ? "border-red-500/30 text-red-400 bg-red-500/5" 
+                            className={`w-full py-3.5 rounded-xl font-bold border transition-colors ${darkMode
+                                    ? "border-red-500/30 text-red-400 bg-red-500/5"
                                     : "border-red-200 text-red-600 bg-red-50"
-                            }`}
+                                }`}
                         >
                             Logout
                         </button>
