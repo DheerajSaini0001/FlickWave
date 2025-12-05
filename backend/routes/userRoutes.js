@@ -45,11 +45,34 @@ router.post('/send-otp', async (req, res) => {
             </div>
         `;
 
-        await sendEmail({
-            email: user.email,
-            subject: 'FlickWave Verification Code',
-            message,
-            html
+        // Offload email sending to a worker thread
+        const { Worker } = require('worker_threads');
+        const path = require('path');
+
+        const worker = new Worker(path.join(__dirname, '../workers/emailWorker.js'), {
+            workerData: {
+                email: user.email,
+                subject: 'FlickWave Verification Code',
+                message,
+                html
+            }
+        });
+
+        worker.on('message', (result) => {
+            if (result.status === 'success') {
+                console.log('Worker: Email sent successfully', result.messageId);
+            } else {
+                console.error('Worker: Failed to send email', result.error);
+            }
+        });
+
+        worker.on('error', (error) => {
+            console.error('Worker Error:', error);
+        });
+
+        worker.on('exit', (code) => {
+            if (code !== 0)
+                console.error(new Error(`Worker stopped with exit code ${code}`));
         });
 
         res.status(200).json({ message: 'OTP sent successfully' });
