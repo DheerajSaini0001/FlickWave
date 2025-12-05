@@ -2,103 +2,68 @@ const express = require('express');
 const router = express.Router();
 const User = require('../models/User');
 const axios = require('axios');
+const bcrypt = require('bcryptjs');
 
-const sendEmail = require('../utils/sendEmail');
-
-// Generate OTP
-const generateOTP = () => {
-    return Math.floor(100000 + Math.random() * 900000).toString();
-};
-
-// Send OTP
-router.post('/send-otp', async (req, res) => {
-    const { email } = req.body;
-    console.log('Received OTP request for:', email);
+// Signup
+router.post('/signup', async (req, res) => {
+    const { email, password, name, nickname } = req.body;
 
     try {
         let user = await User.findOne({ email });
-
-        if (!user) {
-            user = new User({
-                email,
-                name: email.split('@')[0],
-                picture: `https://ui-avatars.com/api/?name=${email}&background=random`,
-                watchlist: []
-            });
+        if (user) {
+            return res.status(400).json({ message: 'User already exists' });
         }
 
-        const otp = generateOTP();
-        const otpExpires = Date.now() + 10 * 60 * 1000; // 10 minutes
+        const salt = await bcrypt.genSalt(10);
+        const hashedPassword = await bcrypt.hash(password, salt);
 
-        user.otp = otp;
-        user.otpExpires = otpExpires;
-        await user.save();
-
-        const message = `Your verification code is: ${otp}`;
-        const html = `
-            <div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto;">
-                <h2 style="color: #dc2626;">FlickWave Login Verification</h2>
-                <p>Hello,</p>
-                <p>Your verification code is:</p>
-                <h1 style="background: #f3f4f6; padding: 10px; text-align: center; letter-spacing: 5px; border-radius: 5px;">${otp}</h1>
-                <p>This code will expire in 10 minutes.</p>
-                <p>If you didn't request this, please ignore this email.</p>
-            </div>
-        `;
-
-        // Send email asynchronously (fire and forget)
-        sendEmail({
-            email: user.email,
-            subject: 'FlickWave Verification Code',
-            message,
-            html
-        }).catch(err => {
-            console.error('Failed to send email:', err);
+        user = new User({
+            email,
+            password: hashedPassword,
+            name: name || email.split('@')[0],
+            nickname: nickname || '',
+            picture: `https://ui-avatars.com/api/?name=${name || email}&background=random`,
+            watchlist: []
         });
 
-        res.status(200).json({ message: 'OTP sent successfully' });
+        await user.save();
+
+        const userResponse = user.toObject();
+        delete userResponse.password;
+
+        res.status(201).json(userResponse);
     } catch (error) {
-        console.error('Error sending OTP:', error);
-        console.error('Error Stack:', error.stack);
-        res.status(500).json({ message: 'Server error', error: error.message });
+        console.error('Error in signup:', error);
+        res.status(500).json({ message: 'Server error' });
     }
 });
 
-// Verify OTP & Login
+// Login
 router.post('/login', async (req, res) => {
-    const { email, otp, nickname } = req.body;
+    const { email, password } = req.body;
 
     try {
         const user = await User.findOne({ email });
-
         if (!user) {
-            return res.status(400).json({ message: 'User not found' });
+            return res.status(400).json({ message: 'Invalid credentials' });
         }
 
-        if (!user.otp || !user.otpExpires) {
-            return res.status(400).json({ message: 'No OTP requested' });
+        if (!user.password) {
+            return res.status(400).json({ message: 'Account not set up for password login. Please sign up again.' });
         }
 
-        if (user.otp !== otp) {
-            return res.status(400).json({ message: 'Invalid OTP' });
+        const isMatch = await bcrypt.compare(password, user.password);
+        if (!isMatch) {
+            return res.status(400).json({ message: 'Invalid credentials' });
         }
 
-        if (user.otpExpires < Date.now()) {
-            return res.status(400).json({ message: 'OTP expired' });
-        }
-
-        // Update user details
-        if (nickname) {
-            user.nickname = nickname;
-        }
         user.lastUpdated = new Date();
-
-        // Clear OTP
-        user.otp = undefined;
-        user.otpExpires = undefined;
         await user.save();
 
-        res.status(200).json(user);
+        const userResponse = user.toObject();
+        delete userResponse.password;
+
+        res.status(200).json(userResponse);
     } catch (error) {
         console.error('Error logging in:', error);
         res.status(500).json({ message: 'Server error' });
@@ -108,7 +73,7 @@ router.post('/login', async (req, res) => {
 // Get User
 router.get('/:email', async (req, res) => {
     try {
-        const user = await User.findOne({ email: req.params.email });
+        const user = await User.findOne({ email: req.params.email }).select('-password');
         if (!user) return res.status(404).json({ message: 'User not found' });
         res.json(user);
     } catch (error) {

@@ -13,8 +13,7 @@ const MovieSchema = new mongoose.Schema({
 
 const UserSchema = new mongoose.Schema({
     email: { type: String, required: true, unique: true },
-    otp: String,
-    otpExpires: Date,
+    password: { type: String, required: true },
     name: String,
     picture: String,
     nickname: String,
