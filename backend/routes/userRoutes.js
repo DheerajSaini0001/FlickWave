@@ -13,6 +13,7 @@ const generateOTP = () => {
 // Send OTP
 router.post('/send-otp', async (req, res) => {
     const { email } = req.body;
+    console.log('Received OTP request for:', email);
 
     try {
         let user = await User.findOne({ email });
