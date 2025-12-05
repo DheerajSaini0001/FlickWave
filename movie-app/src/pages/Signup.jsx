@@ -4,21 +4,23 @@ import { useAuth } from '../auth/AuthProvider';
 import { motion } from 'framer-motion';
 import { useTheme } from '../context/ThemeContext';
 
-const Login = () => {
+const Signup = () => {
+    const [name, setName] = useState('');
     const [email, setEmail] = useState('');
     const [password, setPassword] = useState('');
+    const [nickname, setNickname] = useState('');
     const [loading, setLoading] = useState(false);
     const [error, setError] = useState('');
-    const { login } = useAuth();
+    const { signup } = useAuth();
     const navigate = useNavigate();
     const { darkMode } = useTheme();
 
-    const handleLogin = async (e) => {
+    const handleSignup = async (e) => {
         e.preventDefault();
         setLoading(true);
         setError('');
 
-        const result = await login(email, password);
+        const result = await signup(email, password, name, nickname);
         if (result.success) {
             navigate('/');
         } else {
@@ -40,7 +42,7 @@ const Login = () => {
             >
                 <h2 className={`text-3xl font-bold mb-6 text-center transition-colors ${darkMode ? 'text-white' : 'text-gray-900'
                     }`}>
-                    Welcome Back
+                    Create Account
                 </h2>
 
                 {error && (
@@ -49,9 +51,26 @@ const Login = () => {
                     </div>
                 )}
 
-                <form onSubmit={handleLogin} className="space-y-6">
+                <form onSubmit={handleSignup} className="space-y-4">
                     <div>
-                        <label className={`block text-sm font-medium mb-2 transition-colors ${darkMode ? 'text-gray-400' : 'text-gray-700'
+                        <label className={`block text-sm font-medium mb-1 transition-colors ${darkMode ? 'text-gray-400' : 'text-gray-700'
+                            }`}>
+                            Full Name
+                        </label>
+                        <input
+                            type="text"
+                            value={name}
+                            onChange={(e) => setName(e.target.value)}
+                            className={`w-full rounded-lg px-4 py-3 focus:outline-none focus:border-red-600 transition-colors ${darkMode
+                                    ? 'bg-black/20 border-white/10 text-white placeholder-gray-600'
+                                    : 'bg-gray-50 border-gray-200 text-gray-900 placeholder-gray-400'
+                                }`}
+                            placeholder="John Doe"
+                            required
+                        />
+                    </div>
+                    <div>
+                        <label className={`block text-sm font-medium mb-1 transition-colors ${darkMode ? 'text-gray-400' : 'text-gray-700'
                             }`}>
                             Email Address
                         </label>
@@ -68,7 +87,7 @@ const Login = () => {
                         />
                     </div>
                     <div>
-                        <label className={`block text-sm font-medium mb-2 transition-colors ${darkMode ? 'text-gray-400' : 'text-gray-700'
+                        <label className={`block text-sm font-medium mb-1 transition-colors ${darkMode ? 'text-gray-400' : 'text-gray-700'
                             }`}>
                             Password
                         </label>
@@ -84,20 +103,36 @@ const Login = () => {
                             required
                         />
                     </div>
+                    <div>
+                        <label className={`block text-sm font-medium mb-1 transition-colors ${darkMode ? 'text-gray-400' : 'text-gray-700'
+                            }`}>
+                            Nickname (Optional)
+                        </label>
+                        <input
+                            type="text"
+                            value={nickname}
+                            onChange={(e) => setNickname(e.target.value)}
+                            className={`w-full rounded-lg px-4 py-3 focus:outline-none focus:border-red-600 transition-colors ${darkMode
+                                    ? 'bg-black/20 border-white/10 text-white placeholder-gray-600'
+                                    : 'bg-gray-50 border-gray-200 text-gray-900 placeholder-gray-400'
+                                }`}
+                            placeholder="MovieBuff"
+                        />
+                    </div>
                     <button
                         type="submit"
                         disabled={loading}
-                        className="w-full bg-gradient-to-r from-red-600 to-orange-600 text-white font-bold py-3 rounded-lg hover:opacity-90 transition-opacity disabled:opacity-50 shadow-lg shadow-red-600/20"
+                        className="w-full bg-gradient-to-r from-red-600 to-orange-600 text-white font-bold py-3 rounded-lg hover:opacity-90 transition-opacity disabled:opacity-50 shadow-lg shadow-red-600/20 mt-2"
                     >
-                        {loading ? 'Signing In...' : 'Sign In'}
+                        {loading ? 'Creating Account...' : 'Sign Up'}
                     </button>
                 </form>
 
                 <p className={`mt-6 text-center text-sm ${darkMode ? 'text-gray-400' : 'text-gray-600'
                     }`}>
-                    Don't have an account?{' '}
-                    <Link to="/signup" className="text-red-600 hover:text-red-500 font-medium">
-                        Sign up
+                    Already have an account?{' '}
+                    <Link to="/login" className="text-red-600 hover:text-red-500 font-medium">
+                        Sign in
                     </Link>
                 </p>
             </motion.div>
@@ -105,4 +140,4 @@ const Login = () => {
     );
 };
 
-export default Login;
+export default Signup;

@@ -20,21 +20,30 @@ export const AuthProvider = ({ children }) => {
         setLoading(false);
     }, []);
 
-    const sendOtp = async (email) => {
-        try {
-            await axios.post(`${API_URL}/users/send-otp`, { email });
-            return true;
-        } catch (error) {
-            console.error("Failed to send OTP:", error);
-            return false;
-        }
-    };
-
-    const login = async (email, otp, nickname) => {
+    const login = async (email, password) => {
         try {
             const res = await axios.post(`${API_URL}/users/login`, {
                 email,
-                otp,
+                password
+            });
+
+            const userData = res.data;
+            setUser(userData);
+            setIsAuthenticated(true);
+            localStorage.setItem('flickwave_user', JSON.stringify(userData));
+            return { success: true };
+        } catch (error) {
+            console.error("Login failed:", error);
+            return { success: false, message: error.response?.data?.message || 'Login failed' };
+        }
+    };
+
+    const signup = async (email, password, name, nickname) => {
+        try {
+            const res = await axios.post(`${API_URL}/users/signup`, {
+                email,
+                password,
+                name,
                 nickname
             });
 
@@ -42,10 +51,10 @@ export const AuthProvider = ({ children }) => {
             setUser(userData);
             setIsAuthenticated(true);
             localStorage.setItem('flickwave_user', JSON.stringify(userData));
-            return true;
+            return { success: true };
         } catch (error) {
-            console.error("Login failed:", error);
-            return false;
+            console.error("Signup failed:", error);
+            return { success: false, message: error.response?.data?.message || 'Signup failed' };
         }
     };
 
@@ -57,7 +66,7 @@ export const AuthProvider = ({ children }) => {
     };
 
     return (
-        <AuthContext.Provider value={{ user, isAuthenticated, login, logout, sendOtp, loading }}>
+        <AuthContext.Provider value={{ user, isAuthenticated, login, signup, logout, loading }}>
             {children}
         </AuthContext.Provider>
     );

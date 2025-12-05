@@ -8,6 +8,7 @@ import SearchResults from './pages/SearchResults';
 import Watchlist from './pages/Watchlist';
 import Profile from './pages/Profile';
 import Login from './pages/Login';
+import Signup from './pages/Signup';
 import Browse from './pages/Browse';
 import CategoryPage from './pages/CategoryPage';
 import ProtectedRoute from './auth/ProtectedRoute';
@@ -22,6 +23,7 @@ function App() {
           <Route path="/movie/:id" element={<MovieDetails />} />
           <Route path="/search" element={<SearchResults />} />
           <Route path="/login" element={<Login />} />
+          <Route path="/signup" element={<Signup />} />
           <Route path="/movies" element={<Browse type="movie" />} />
           <Route path="/tv-shows" element={<Browse type="tv" />} />
           <Route path="/category/:type/:category" element={<CategoryPage />} />
