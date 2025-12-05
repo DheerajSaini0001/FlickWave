@@ -62,7 +62,7 @@ const MovieRow = ({ title, movies, viewAllPath }) => {
                     {movies.map((movie, index) => (
                         <motion.div
                             key={movie.id}
-                            className="min-w-[80px] md:min-w-[180px] flex-shrink-0 snap-start"
+                            className="w-[200px] md:w-[240px] flex-shrink-0 snap-start"
                             initial={{ opacity: 0, y: 20 }}
                             whileInView={{ opacity: 1, y: 0 }}
                             transition={{ duration: 0.5, delay: index * 0.05 }}

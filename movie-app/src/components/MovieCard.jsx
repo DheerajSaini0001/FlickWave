@@ -21,7 +21,7 @@ const MovieCard = ({ movie }) => {
         <Link to={linkPath} className="block h-full relative group perspective-1000">
             <motion.div
                 // 3. Conditional Background color for the card container
-                className={`relative rounded-2xl overflow-hidden shadow-xl w-[300px] h-[450px] transform-gpu transition-colors duration-300 ${darkMode ? "bg-[#1a1c24]" : "bg-white"
+                className={`relative rounded-2xl overflow-hidden shadow-xl w-full max-w-[300px] transform-gpu transition-colors duration-300 ${darkMode ? "bg-[#1a1c24]" : "bg-white"
                     }`}
                 whileHover={{
                     scale: 1.05,
