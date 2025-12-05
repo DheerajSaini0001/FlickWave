@@ -1,27 +1,35 @@
-const axios = require('axios');
+const nodemailer = require('nodemailer');
 
 const sendEmail = async (options) => {
-    const data = {
-        service_id: process.env.EMAILJS_SERVICE_ID,
-        template_id: process.env.EMAILJS_TEMPLATE_ID,
-        user_id: process.env.EMAILJS_PUBLIC_KEY,
-        accessToken: process.env.EMAILJS_PRIVATE_KEY,
-        template_params: {
-            to_email: options.email,
-            subject: options.subject,
-            message: options.message,
-            html_message: options.html,
-            otp: options.otp // Ensure this is passed from the caller if needed
-        }
+    console.log('SMTP Config:', {
+        host: process.env.SMTP_HOST,
+        port: process.env.SMTP_PORT,
+        user: process.env.SMTP_USER,
+        pass: process.env.SMTP_PASS ? '****' : 'MISSING' // Mask password
+    });
+
+    const transporter = nodemailer.createTransport({
+        host: process.env.SMTP_HOST,
+        port: process.env.SMTP_PORT,
+        secure: process.env.SMTP_PORT == 465, // true for 465, false for other ports
+        auth: {
+            user: process.env.SMTP_USER,
+            pass: process.env.SMTP_PASS,
+        },
+        family: 4, // Force IPv4 to avoid IPv6 connectivity issues
+    });
+
+    const message = {
+        from: `${process.env.FROM_NAME} <${process.env.SMTP_USER}>`,
+        to: options.email,
+        subject: options.subject,
+        text: options.message,
+        html: options.html,
     };
 
-    try {
-        await axios.post('https://api.emailjs.com/api/v1.0/email/send', data);
-        console.log('Email sent successfully via EmailJS');
-    } catch (error) {
-        console.error('Error sending email via EmailJS:', error.response?.data || error.message);
-        throw new Error('Email could not be sent');
-    }
+    const info = await transporter.sendMail(message);
+
+    console.log('Message sent: %s', info.messageId);
 };
 
 module.exports = sendEmail;
