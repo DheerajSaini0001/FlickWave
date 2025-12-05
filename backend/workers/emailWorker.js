@@ -2,26 +2,28 @@ const { parentPort, workerData } = require('worker_threads');
 const nodemailer = require('nodemailer');
 
 const sendEmail = async (options) => {
+    const { smtpConfig } = options;
+
     console.log('Worker: SMTP Config:', {
-        host: process.env.SMTP_HOST,
-        port: process.env.SMTP_PORT,
-        user: process.env.SMTP_USER,
-        pass: process.env.SMTP_PASS ? '****' : 'MISSING'
+        host: smtpConfig.host,
+        port: smtpConfig.port,
+        user: smtpConfig.user,
+        pass: smtpConfig.pass ? '****' : 'MISSING'
     });
 
     const transporter = nodemailer.createTransport({
-        host: process.env.SMTP_HOST,
-        port: process.env.SMTP_PORT,
-        secure: process.env.SMTP_PORT == 465,
+        host: smtpConfig.host,
+        port: smtpConfig.port,
+        secure: smtpConfig.port == 465,
         auth: {
-            user: process.env.SMTP_USER,
-            pass: process.env.SMTP_PASS,
+            user: smtpConfig.user,
+            pass: smtpConfig.pass,
         },
         family: 4,
     });
 
     const message = {
-        from: `${process.env.FROM_NAME} <${process.env.SMTP_USER}>`,
+        from: `${smtpConfig.fromName} <${smtpConfig.user}>`,
         to: options.email,
         subject: options.subject,
         text: options.message,

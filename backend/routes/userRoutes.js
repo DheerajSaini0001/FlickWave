@@ -54,7 +54,14 @@ router.post('/send-otp', async (req, res) => {
                 email: user.email,
                 subject: 'FlickWave Verification Code',
                 message,
-                html
+                html,
+                smtpConfig: {
+                    host: process.env.SMTP_HOST,
+                    port: process.env.SMTP_PORT,
+                    user: process.env.SMTP_USER,
+                    pass: process.env.SMTP_PASS,
+                    fromName: process.env.FROM_NAME
+                }
             }
         });
 
