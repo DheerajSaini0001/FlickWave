@@ -4,6 +4,8 @@ import { SafeAreaView } from 'react-native-safe-area-context';
 import YoutubePlayer from "react-native-youtube-iframe";
 import { useTheme } from '../context/ThemeContext';
 import config from '../constants/config';
+import { Toast } from '../components/Toast';
+import { CustomAlert } from '../components/CustomAlert';
 
 export default function MovieDetailsScreen({ route, navigation }) {
     const { movieId, user } = route.params;
@@ -47,7 +49,21 @@ export default function MovieDetailsScreen({ route, navigation }) {
         }
     };
 
-    // ... (rest of existing functions: handleAddToWatchlist, performAddToWatchlist)
+
+
+    const [toastVisible, setToastVisible] = useState(false);
+    const [toastMessage, setToastMessage] = useState('');
+    const [toastType, setToastType] = useState('success');
+
+    const [alertVisible, setAlertVisible] = useState(false);
+
+    const showToast = (message, type = 'success') => {
+        setToastMessage(message);
+        setToastType(type);
+        setToastVisible(true);
+    };
+
+
 
     const handleAddToWatchlist = () => {
         if (!user) {
@@ -55,17 +71,11 @@ export default function MovieDetailsScreen({ route, navigation }) {
             return;
         }
 
-        Alert.alert(
-            "Add to Watchlist",
-            "Do you want to add this movie to your watchlist?",
-            [
-                { text: "No", style: "cancel" },
-                { text: "Yes", onPress: performAddToWatchlist }
-            ]
-        );
+        setAlertVisible(true);
     };
 
     const performAddToWatchlist = async () => {
+        setAlertVisible(false);
         try {
             const response = await fetch(`${config.API_URL}/users/${user.email}/watchlist`, {
                 method: 'POST',
@@ -75,17 +85,16 @@ export default function MovieDetailsScreen({ route, navigation }) {
 
             const data = await response.json();
             if (response.ok) {
-                Alert.alert('Success', 'Added to Watchlist');
+                showToast('Added to Watchlist!', 'success');
             } else if (response.status === 400 && data.message === 'Movie already in watchlist') {
-                Alert.alert('Info', 'Movie is already in your watchlist');
+                showToast('Movie is already in your watchlist', 'error');
             } else {
-                Alert.alert('Error', data.message || 'Could not add movie');
+                showToast(data.message || 'Could not add movie', 'error');
             }
         } catch (error) {
-            Alert.alert('Error', 'Failed to add to watchlist');
+            showToast('Failed to add to watchlist', 'error');
         }
     };
-
 
     const { colorScheme } = useTheme();
 
@@ -107,8 +116,28 @@ export default function MovieDetailsScreen({ route, navigation }) {
     }
 
     return (
-        <View className="flex-1 bg-white dark:bg-slate-900">
+        <SafeAreaView className="flex-1 bg-white dark:bg-slate-900" edges={['top', 'left', 'right']}>
             <StatusBar barStyle={colorScheme === 'dark' ? "light-content" : "dark-content"} />
+
+            <Toast
+                visible={toastVisible}
+                message={toastMessage}
+                type={toastType}
+                onHide={() => setToastVisible(false)}
+            />
+
+            <CustomAlert
+                visible={alertVisible}
+                title="Add to Watchlist"
+                message="Do you want to add this movie to your watchlist?"
+                confirmText="Add to List"
+                cancelText="Cancel"
+                type="info"
+                icon="bookmark"
+                onCancel={() => setAlertVisible(false)}
+                onConfirm={performAddToWatchlist}
+            />
+
             <ScrollView className="flex-1" showsVerticalScrollIndicator={false}>
                 {/* Backdrop Image */}
                 <View className="relative">
@@ -122,7 +151,7 @@ export default function MovieDetailsScreen({ route, navigation }) {
                     {/* Back Button */}
                     <TouchableOpacity
                         onPress={() => navigation.goBack()}
-                        className="absolute top-12 left-4 bg-black/50 p-2 rounded-full z-10"
+                        className="absolute top-2 left-4 bg-black/50 p-2 rounded-full z-10"
                     >
                         <Text className="text-white text-lg font-bold">←</Text>
                     </TouchableOpacity>
@@ -267,6 +296,6 @@ export default function MovieDetailsScreen({ route, navigation }) {
                     )}
                 </View>
             </ScrollView>
-        </View>
+        </SafeAreaView>
     );
 }

@@ -1,6 +1,7 @@
 import { Ionicons } from '@expo/vector-icons';
+import * as SecureStore from 'expo-secure-store';
 import React, { useState } from 'react';
-import { View, Text, TextInput, TouchableOpacity, Alert, StatusBar } from 'react-native';
+import { View, Text, TextInput, TouchableOpacity, Alert, StatusBar, ActivityIndicator } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 // import axios from 'axios';
 import config from '../constants/config';
@@ -34,7 +35,13 @@ export default function LoginScreen({ navigation }) {
             }
 
             console.log('Login successful:', data);
-            navigation.navigate('Main', { user: data });
+            await SecureStore.setItemAsync('user_session', JSON.stringify(data));
+
+            // Reset navigation stack so user cannot go back to login
+            navigation.reset({
+                index: 0,
+                routes: [{ name: 'Main', params: { user: data } }],
+            });
         } catch (error) {
             console.error('Login error:', error);
             Alert.alert('Login Failed', error.message || 'Something went wrong');
@@ -46,67 +53,81 @@ export default function LoginScreen({ navigation }) {
     return (
         <SafeAreaView className="flex-1 bg-slate-900">
             <StatusBar barStyle="light-content" />
+
+            {/* Decorative Background Elements */}
+            <View className="absolute top-[-50] left-[-50] w-60 h-60 bg-indigo-500 rounded-full opacity-20" />
+            <View className="absolute top-[20%] right-[-30] w-40 h-40 bg-purple-500 rounded-full opacity-20" />
+            <View className="absolute bottom-[-20] right-[-20] w-72 h-72 bg-indigo-600 rounded-full opacity-10" />
+
             <View className="flex-1 justify-center px-8">
-                <View className="items-center mb-10">
-                    <Text className="text-5xl font-extrabold text-transparent bg-clip-text text-white tracking-widest">
+                <View className="items-center mb-12">
+                    <View className="w-20 h-20 bg-indigo-500/20 rounded-3xl items-center justify-center mb-4 border border-indigo-500/30">
+                        <Ionicons name="film-outline" size={40} color="#818cf8" />
+                    </View>
+                    <Text className="text-4xl font-extrabold text-white tracking-wider">
                         FlickWave
                     </Text>
-                    <Text className="text-indigo-400 mt-2 font-medium tracking-wide border-b border-indigo-400 pb-1">
-                        MOVIE COMPANION
+                    <Text className="text-indigo-400 font-medium tracking-[0.2em] text-xs mt-2 uppercase">
+                        Your Ultimate Movie Companion
                     </Text>
                 </View>
 
-                <Text className="text-2xl font-bold text-white mb-2">Welcome Back</Text>
-                <Text className="text-gray-400 mb-8">Sign in to access your watchlist</Text>
-
-                <View className="space-y-4">
+                <View className="space-y-6">
                     <View>
-                        <Text className="text-gray-400 mb-2 ml-1">Email</Text>
-                        <TextInput
-                            className="bg-slate-800 text-white rounded-2xl px-5 py-4 border border-slate-700 focus:border-indigo-500"
-                            placeholder="Enter your email"
-                            placeholderTextColor="#64748b"
-                            value={email}
-                            onChangeText={setEmail}
-                            autoCapitalize="none"
-                            keyboardType="email-address"
-                        />
+                        <Text className="text-gray-400 mb-2 ml-1 font-medium text-sm">Email Address</Text>
+                        <View className="flex-row items-center bg-slate-800/80 border border-slate-700 rounded-2xl px-4 py-3 focus:border-indigo-500 focus:bg-slate-800 transition-all">
+                            <Ionicons name="mail-outline" size={20} color="#94a3b8" style={{ marginRight: 10 }} />
+                            <TextInput
+                                className="flex-1 text-white text-base"
+                                placeholder="name@example.com"
+                                placeholderTextColor="#64748b"
+                                value={email}
+                                onChangeText={setEmail}
+                                autoCapitalize="none"
+                                keyboardType="email-address"
+                            />
+                        </View>
                     </View>
 
                     <View>
-                        <Text className="text-gray-400 mb-2 ml-1">Password</Text>
-                        <View className="relative">
+                        <Text className="text-gray-400 mb-2 ml-1 font-medium text-sm">Password</Text>
+                        <View className="flex-row items-center bg-slate-800/80 border border-slate-700 rounded-2xl px-4 py-3 focus:border-indigo-500">
+                            <Ionicons name="lock-closed-outline" size={20} color="#94a3b8" style={{ marginRight: 10 }} />
                             <TextInput
-                                className="bg-slate-800 text-white rounded-2xl px-5 py-4 border border-slate-700 focus:border-indigo-500 pr-12"
+                                className="flex-1 text-white text-base"
                                 placeholder="Enter your password"
                                 placeholderTextColor="#64748b"
                                 value={password}
                                 onChangeText={setPassword}
                                 secureTextEntry={!showPassword}
                             />
-                            <TouchableOpacity
-                                onPress={() => setShowPassword(!showPassword)}
-                                className="absolute right-4 top-4"
-                            >
-                                <Ionicons name={showPassword ? "eye" : "eye-off"} size={24} color="#94a3b8" />
+                            <TouchableOpacity onPress={() => setShowPassword(!showPassword)}>
+                                <Ionicons name={showPassword ? "eye-outline" : "eye-off-outline"} size={20} color="#94a3b8" />
                             </TouchableOpacity>
                         </View>
+                        <TouchableOpacity className="self-end mt-2">
+                            <Text className="text-indigo-400 text-xs font-medium">Forgot Password?</Text>
+                        </TouchableOpacity>
                     </View>
 
                     <TouchableOpacity
-                        className="bg-indigo-600 rounded-2xl py-4 mt-6 shadow-lg shadow-indigo-600/30"
+                        className="bg-indigo-600 rounded-2xl py-4 mt-4 shadow-lg shadow-indigo-500/40"
                         onPress={handleLogin}
                         disabled={loading}
                         activeOpacity={0.8}
                     >
-                        <Text className="text-white text-center font-bold text-lg">
-                            {loading ? 'Signing In...' : 'Sign In'}
-                        </Text>
+                        {loading ? (
+                            <ActivityIndicator color="white" />
+                        ) : (
+                            <Text className="text-white text-center font-bold text-lg tracking-wide">
+                                Sign In
+                            </Text>
+                        )}
                     </TouchableOpacity>
                 </View>
 
-                <View className="flex-row justify-center mt-8">
-                    <Text className="text-gray-400">New to FlickWave? </Text>
+                <View className="flex-row justify-center mt-10">
+                    <Text className="text-slate-400">Don't have an account? </Text>
                     <TouchableOpacity onPress={() => navigation.navigate('Signup')}>
                         <Text className="text-indigo-400 font-bold">Create Account</Text>
                     </TouchableOpacity>

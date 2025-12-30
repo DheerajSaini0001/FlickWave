@@ -1,12 +1,53 @@
+import React, { useState } from 'react';
+import { View, Text, TouchableOpacity, Image, StatusBar, Alert } from 'react-native';
+import { SafeAreaView } from 'react-native-safe-area-context';
 import { useTheme } from '../context/ThemeContext';
 import { Ionicons } from '@expo/vector-icons';
+import { useFocusEffect } from '@react-navigation/native';
+import config from '../constants/config';
+import * as SecureStore from 'expo-secure-store';
+import { CustomAlert } from '../components/CustomAlert';
+
+
 
 export default function ProfileScreen({ route, navigation }) {
     const { user: initialUser } = route.params || {};
     const [user, setUser] = useState(initialUser);
     const { colorScheme, toggleColorScheme } = useTheme();
+    const [alertVisible, setAlertVisible] = useState(false);
 
-    // ... (rest of the code)
+    useFocusEffect(
+        React.useCallback(() => {
+            fetchUserData();
+        }, [])
+    );
+
+    const fetchUserData = async () => {
+        if (!initialUser?.email) return;
+        try {
+            const response = await fetch(`${config.API_URL}/users/${initialUser.email}`);
+            if (response.ok) {
+                const data = await response.json();
+                setUser(data);
+            }
+        } catch (error) {
+            console.error('Error refreshing profile data:', error);
+        }
+    };
+
+    const performLogout = async () => {
+        setAlertVisible(false);
+        try {
+            await SecureStore.deleteItemAsync('user_session');
+            navigation.reset({
+                index: 0,
+                routes: [{ name: 'Login' }],
+            });
+        } catch (error) {
+            console.error('Logout failed', error);
+            Alert.alert('Error', 'Failed to logout');
+        }
+    };
 
     return (
         <SafeAreaView className="flex-1 bg-white dark:bg-slate-900">
@@ -46,11 +87,22 @@ export default function ProfileScreen({ route, navigation }) {
 
                 <TouchableOpacity
                     className="bg-red-500/10 border border-red-500/50 rounded-xl py-4 items-center"
-                    onPress={handleLogout}
+                    onPress={() => setAlertVisible(true)}
                     activeOpacity={0.7}
                 >
                     <Text className="text-red-500 font-bold text-lg">Log Out</Text>
                 </TouchableOpacity>
+
+                <CustomAlert
+                    visible={alertVisible}
+                    title="Log Out"
+                    message="Are you sure you want to log out?"
+                    confirmText="Log Out"
+                    cancelText="Cancel"
+                    type="danger"
+                    onCancel={() => setAlertVisible(false)}
+                    onConfirm={performLogout}
+                />
             </View>
         </SafeAreaView>
     );

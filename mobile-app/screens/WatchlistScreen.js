@@ -4,11 +4,15 @@ import { SafeAreaView } from 'react-native-safe-area-context';
 import { Ionicons } from '@expo/vector-icons';
 // import axios from 'axios';
 import config from '../constants/config';
+import { Toast } from '../components/Toast';
+import { CustomAlert } from '../components/CustomAlert';
+import { useTheme } from '../context/ThemeContext';
 
 export default function WatchlistScreen({ route, navigation }) {
     const { user: initialUser } = route.params || {};
     const [user, setUser] = useState(initialUser);
     const [refreshing, setRefreshing] = useState(false);
+    const { colorScheme } = useTheme();
 
     const fetchUserData = async () => {
         if (!user?.email) return;
@@ -26,35 +30,46 @@ export default function WatchlistScreen({ route, navigation }) {
         }
     };
 
-    const handleRemoveMovie = async (movieId) => {
-        Alert.alert(
-            "Remove from Watchlist",
-            "Are you sure you want to remove this movie?",
-            [
-                { text: "Cancel", style: "cancel" },
-                {
-                    text: "Remove",
-                    style: "destructive",
-                    onPress: async () => {
-                        try {
-                            const response = await fetch(`${config.API_URL}/users/${user.email}/watchlist/${movieId}`, {
-                                method: 'DELETE',
-                            });
+    const [toastVisible, setToastVisible] = useState(false);
+    const [toastMessage, setToastMessage] = useState('');
+    const [toastType, setToastType] = useState('success');
 
-                            if (!response.ok) {
-                                throw new Error('Failed to remove movie');
-                            }
+    const [alertVisible, setAlertVisible] = useState(false);
+    const [selectedMovieId, setSelectedMovieId] = useState(null);
 
-                            const updatedWatchlist = await response.json();
-                            setUser(prev => ({ ...prev, watchlist: updatedWatchlist }));
-                        } catch (error) {
-                            console.error('Error removing movie:', error);
-                            Alert.alert('Error', 'Failed to remove movie from watchlist');
-                        }
-                    }
-                }
-            ]
-        );
+    const showToast = (message, type = 'success') => {
+        setToastMessage(message);
+        setToastType(type);
+        setToastVisible(true);
+    };
+
+    const confirmRemoveMovie = (movieId) => {
+        setSelectedMovieId(movieId);
+        setAlertVisible(true);
+    };
+
+    const performRemoveMovie = async () => {
+        if (!selectedMovieId) return;
+
+        setAlertVisible(false);
+        try {
+            const response = await fetch(`${config.API_URL}/users/${user.email}/watchlist/${selectedMovieId}`, {
+                method: 'DELETE',
+            });
+
+            if (!response.ok) {
+                throw new Error('Failed to remove movie');
+            }
+
+            const updatedWatchlist = await response.json();
+            setUser(prev => ({ ...prev, watchlist: updatedWatchlist }));
+            showToast('Movie removed from watchlist', 'success');
+        } catch (error) {
+            console.error('Error removing movie:', error);
+            showToast('Failed to remove movie', 'error');
+        } finally {
+            setSelectedMovieId(null);
+        }
     };
 
     const onRefresh = async () => {
@@ -77,7 +92,7 @@ export default function WatchlistScreen({ route, navigation }) {
 
     const renderMovieItem = ({ item }) => (
         <TouchableOpacity
-            className="flex-1 m-2 bg-slate-800 rounded-xl overflow-hidden shadow-lg shadow-black/50"
+            className="flex-1 m-2 bg-slate-100 dark:bg-slate-800 rounded-xl overflow-hidden shadow-lg shadow-black/50"
             onPress={() => navigation.navigate('MovieDetails', { movieId: item.id, user })}
             activeOpacity={0.9}
         >
@@ -89,29 +104,48 @@ export default function WatchlistScreen({ route, navigation }) {
                 />
                 <TouchableOpacity
                     className="absolute top-2 right-2 bg-black/50 p-2 rounded-full"
-                    onPress={() => handleRemoveMovie(item.id)}
+                    onPress={() => confirmRemoveMovie(item.id)}
                 >
                     <Ionicons name="trash-outline" size={20} color="#ef4444" />
                 </TouchableOpacity>
             </View>
             <View className="p-3">
-                <Text numberOfLines={1} className="text-white font-semibold text-sm mb-1">{item.title}</Text>
+                <Text numberOfLines={1} className="text-slate-900 dark:text-white font-semibold text-sm mb-1">{item.title}</Text>
                 <View className="flex-row items-center">
                     <Text className="text-yellow-500 text-xs mr-1">★</Text>
-                    <Text className="text-gray-400 text-xs">{item.vote_average?.toFixed(1)}</Text>
+                    <Text className="text-slate-500 dark:text-gray-400 text-xs">{item.vote_average?.toFixed(1)}</Text>
                 </View>
             </View>
         </TouchableOpacity>
     );
 
     return (
-        <SafeAreaView className="flex-1 bg-slate-900">
-            <StatusBar barStyle="light-content" />
-            <View className="flex-1 pt-4 px-4 bg-slate-900">
+        <SafeAreaView className="flex-1 bg-white dark:bg-slate-900">
+            <StatusBar barStyle={colorScheme === 'dark' ? "light-content" : "dark-content"} />
+
+            <Toast
+                visible={toastVisible}
+                message={toastMessage}
+                type={toastType}
+                onHide={() => setToastVisible(false)}
+            />
+
+            <CustomAlert
+                visible={alertVisible}
+                title="Remove Movie"
+                message="Are you sure you want to remove this movie from your watchlist?"
+                confirmText="Remove"
+                cancelText="Cancel"
+                type="danger"
+                onCancel={() => setAlertVisible(false)}
+                onConfirm={performRemoveMovie}
+            />
+
+            <View className="flex-1 pt-4 px-4 bg-white dark:bg-slate-900">
                 <View className="flex-row justify-between items-center mb-6 mt-2">
                     <View>
-                        <Text className="text-3xl font-extrabold text-white tracking-tight">Watchlist</Text>
-                        {user && <Text className="text-indigo-400 font-medium">{user.name}</Text>}
+                        <Text className="text-3xl font-extrabold text-slate-900 dark:text-white tracking-tight">Watchlist</Text>
+                        {user && <Text className="text-indigo-500 dark:text-indigo-400 font-medium">{user.name}</Text>}
                     </View>
 
                 </View>
@@ -130,11 +164,11 @@ export default function WatchlistScreen({ route, navigation }) {
                     />
                 ) : (
                     <View className="flex-1 items-center justify-center -mt-20">
-                        <View className="bg-slate-800 p-6 rounded-full mb-6">
+                        <View className="bg-slate-100 dark:bg-slate-800 p-6 rounded-full mb-6">
                             <Text className="text-4xl">🎬</Text>
                         </View>
-                        <Text className="text-gray-300 text-xl font-bold mb-2">No movies yet</Text>
-                        <Text className="text-gray-500 text-center px-10 leading-6">
+                        <Text className="text-slate-900 dark:text-gray-300 text-xl font-bold mb-2">No movies yet</Text>
+                        <Text className="text-slate-500 dark:text-gray-500 text-center px-10 leading-6">
                             Your watchlist is empty. Add movies from the web app to see them here!
                         </Text>
                     </View>
