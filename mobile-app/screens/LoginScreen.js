@@ -1,3 +1,4 @@
+import { Ionicons } from '@expo/vector-icons';
 import React, { useState } from 'react';
 import { View, Text, TextInput, TouchableOpacity, Alert, StatusBar } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
@@ -7,6 +8,7 @@ import config from '../constants/config';
 export default function LoginScreen({ navigation }) {
     const [email, setEmail] = useState('');
     const [password, setPassword] = useState('');
+    const [showPassword, setShowPassword] = useState(false);
     const [loading, setLoading] = useState(false);
 
     const handleLogin = async () => {
@@ -73,14 +75,22 @@ export default function LoginScreen({ navigation }) {
 
                     <View>
                         <Text className="text-gray-400 mb-2 ml-1">Password</Text>
-                        <TextInput
-                            className="bg-slate-800 text-white rounded-2xl px-5 py-4 border border-slate-700 focus:border-indigo-500"
-                            placeholder="Enter your password"
-                            placeholderTextColor="#64748b"
-                            value={password}
-                            onChangeText={setPassword}
-                            secureTextEntry
-                        />
+                        <View className="relative">
+                            <TextInput
+                                className="bg-slate-800 text-white rounded-2xl px-5 py-4 border border-slate-700 focus:border-indigo-500 pr-12"
+                                placeholder="Enter your password"
+                                placeholderTextColor="#64748b"
+                                value={password}
+                                onChangeText={setPassword}
+                                secureTextEntry={!showPassword}
+                            />
+                            <TouchableOpacity
+                                onPress={() => setShowPassword(!showPassword)}
+                                className="absolute right-4 top-4"
+                            >
+                                <Ionicons name={showPassword ? "eye" : "eye-off"} size={24} color="#94a3b8" />
+                            </TouchableOpacity>
+                        </View>
                     </View>
 
                     <TouchableOpacity
