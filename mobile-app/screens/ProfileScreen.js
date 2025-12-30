@@ -1,9 +1,31 @@
-import React from 'react';
+import React, { useState, useCallback } from 'react';
 import { View, Text, TouchableOpacity, Image, StatusBar } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
+import { useFocusEffect } from '@react-navigation/native';
+import config from '../constants/config';
 
 export default function ProfileScreen({ route, navigation }) {
-    const { user } = route.params || {};
+    const { user: initialUser } = route.params || {};
+    const [user, setUser] = useState(initialUser);
+
+    const fetchUserData = async () => {
+        if (!user?.email) return;
+        try {
+            const response = await fetch(`${config.API_URL}/users/${user.email}`);
+            if (response.ok) {
+                const data = await response.json();
+                setUser(data);
+            }
+        } catch (error) {
+            console.error('Error refreshing profile:', error);
+        }
+    };
+
+    useFocusEffect(
+        useCallback(() => {
+            fetchUserData();
+        }, [])
+    );
 
     const handleLogout = () => {
         navigation.reset({

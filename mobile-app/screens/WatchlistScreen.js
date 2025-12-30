@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react';
-import { View, Text, SafeAreaView as RNSafeAreaView, StatusBar, TouchableOpacity, FlatList, Image } from 'react-native';
+import { View, Text, SafeAreaView as RNSafeAreaView, StatusBar, TouchableOpacity, FlatList, Image, Alert } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
+import { Ionicons } from '@expo/vector-icons';
 // import axios from 'axios';
 import config from '../constants/config';
 
@@ -25,6 +26,37 @@ export default function WatchlistScreen({ route, navigation }) {
         }
     };
 
+    const handleRemoveMovie = async (movieId) => {
+        Alert.alert(
+            "Remove from Watchlist",
+            "Are you sure you want to remove this movie?",
+            [
+                { text: "Cancel", style: "cancel" },
+                {
+                    text: "Remove",
+                    style: "destructive",
+                    onPress: async () => {
+                        try {
+                            const response = await fetch(`${config.API_URL}/users/${user.email}/watchlist/${movieId}`, {
+                                method: 'DELETE',
+                            });
+
+                            if (!response.ok) {
+                                throw new Error('Failed to remove movie');
+                            }
+
+                            const updatedWatchlist = await response.json();
+                            setUser(prev => ({ ...prev, watchlist: updatedWatchlist }));
+                        } catch (error) {
+                            console.error('Error removing movie:', error);
+                            Alert.alert('Error', 'Failed to remove movie from watchlist');
+                        }
+                    }
+                }
+            ]
+        );
+    };
+
     const onRefresh = async () => {
         setRefreshing(true);
         await fetchUserData();
@@ -35,17 +67,33 @@ export default function WatchlistScreen({ route, navigation }) {
         fetchUserData();
     }, []);
 
+    useEffect(() => {
+        if (user?.watchlist) {
+            navigation.setOptions({
+                tabBarBadge: user.watchlist.length > 0 ? user.watchlist.length : null,
+            });
+        }
+    }, [user?.watchlist, navigation]);
+
     const renderMovieItem = ({ item }) => (
         <TouchableOpacity
             className="flex-1 m-2 bg-slate-800 rounded-xl overflow-hidden shadow-lg shadow-black/50"
             onPress={() => navigation.navigate('MovieDetails', { movieId: item.id, user })}
             activeOpacity={0.9}
         >
-            <Image
-                source={{ uri: `https://image.tmdb.org/t/p/w500${item.poster_path}` }}
-                className="w-full h-56"
-                resizeMode="cover"
-            />
+            <View className="relative">
+                <Image
+                    source={{ uri: `https://image.tmdb.org/t/p/w500${item.poster_path}` }}
+                    className="w-full h-56"
+                    resizeMode="cover"
+                />
+                <TouchableOpacity
+                    className="absolute top-2 right-2 bg-black/50 p-2 rounded-full"
+                    onPress={() => handleRemoveMovie(item.id)}
+                >
+                    <Ionicons name="trash-outline" size={20} color="#ef4444" />
+                </TouchableOpacity>
+            </View>
             <View className="p-3">
                 <Text numberOfLines={1} className="text-white font-semibold text-sm mb-1">{item.title}</Text>
                 <View className="flex-row items-center">

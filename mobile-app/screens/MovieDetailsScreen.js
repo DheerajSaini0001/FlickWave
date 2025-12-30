@@ -33,11 +33,23 @@ export default function MovieDetailsScreen({ route, navigation }) {
         }
     };
 
-    const addToWatchlist = async () => {
+    const handleAddToWatchlist = () => {
         if (!user) {
             Alert.alert('Login Required', 'Please login to add to watchlist');
             return;
         }
+
+        Alert.alert(
+            "Add to Watchlist",
+            "Do you want to add this movie to your watchlist?",
+            [
+                { text: "No", style: "cancel" },
+                { text: "Yes", onPress: performAddToWatchlist }
+            ]
+        );
+    };
+
+    const performAddToWatchlist = async () => {
         try {
             const response = await fetch(`${config.API_URL}/users/${user.email}/watchlist`, {
                 method: 'POST',
@@ -122,7 +134,7 @@ export default function MovieDetailsScreen({ route, navigation }) {
                     <View className="flex-row mt-6 mb-6">
                         <TouchableOpacity
                             className="bg-indigo-600 flex-1 py-3 rounded-xl mr-3 items-center"
-                            onPress={addToWatchlist}
+                            onPress={handleAddToWatchlist}
                         >
                             <Text className="text-white font-bold text-base">Add to Watchlist</Text>
                         </TouchableOpacity>

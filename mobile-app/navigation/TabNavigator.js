@@ -55,7 +55,8 @@ export default function TabNavigator({ route }) {
                 initialParams={{ user }}
                 options={{
                     title: 'Watchlist',
-                    tabBarIcon: ({ focused }) => <TabIcon focused={focused} icon="🎬" />
+                    tabBarIcon: ({ focused }) => <TabIcon focused={focused} icon="🎬" />,
+                    tabBarBadge: user?.watchlist?.length > 0 ? user.watchlist.length : null,
                 }}
             />
             <Tab.Screen
