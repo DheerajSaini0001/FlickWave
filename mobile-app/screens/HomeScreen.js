@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { View, Text, FlatList, Image, TouchableOpacity, ActivityIndicator, Alert, StatusBar } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
+import { useTheme } from '../context/ThemeContext';
 import config from '../constants/config';
 
 export default function HomeScreen({ navigation, route }) {
@@ -69,9 +70,11 @@ export default function HomeScreen({ navigation, route }) {
         }
     };
 
+    const { colorScheme } = useTheme();
+
     const renderMovie = ({ item }) => (
         <TouchableOpacity
-            className="flex-1 m-2 bg-slate-800 rounded-xl overflow-hidden shadow-lg shadow-black/50"
+            className="flex-1 m-2 bg-slate-100 dark:bg-slate-800 rounded-xl overflow-hidden shadow-lg shadow-black/50"
             onPress={() => navigation.navigate('MovieDetails', { movieId: item.id, user })}
             activeOpacity={0.9}
         >
@@ -81,10 +84,10 @@ export default function HomeScreen({ navigation, route }) {
                 resizeMode="cover"
             />
             <View className="p-3">
-                <Text numberOfLines={1} className="text-white font-bold text-base mb-1">{item.title}</Text>
+                <Text numberOfLines={1} className="text-slate-900 dark:text-white font-bold text-base mb-1">{item.title}</Text>
                 <View className="flex-row justify-between items-center mb-2">
-                    <Text className="text-yellow-500 text-xs">★ {item.vote_average?.toFixed(1)}</Text>
-                    <Text className="text-gray-400 text-xs">{item.release_date?.split('-')[0]}</Text>
+                    <Text className="text-yellow-600 dark:text-yellow-500 text-xs">★ {item.vote_average?.toFixed(1)}</Text>
+                    <Text className="text-slate-500 dark:text-gray-400 text-xs">{item.release_date?.split('-')[0]}</Text>
                 </View>
                 <TouchableOpacity
                     className="bg-indigo-600 py-2 rounded-lg items-center active:bg-indigo-700"
@@ -97,20 +100,20 @@ export default function HomeScreen({ navigation, route }) {
     );
 
     return (
-        <SafeAreaView className="flex-1 bg-slate-900">
-            <StatusBar barStyle="light-content" />
+        <SafeAreaView className="flex-1 bg-white dark:bg-slate-900">
+            <StatusBar barStyle={colorScheme === 'dark' ? "light-content" : "dark-content"} />
             <View className="flex-1 px-4 pt-2">
                 <View className="flex-row justify-between items-center mb-6 mt-2">
                     <View>
-                        <Text className="text-3xl font-extrabold text-transparent bg-clip-text text-white tracking-widest">
+                        <Text className="text-3xl font-extrabold text-transparent bg-clip-text text-indigo-600 dark:text-white tracking-widest">
                             FlickWave
                         </Text>
-                        <Text className="text-gray-400 text-xs tracking-widest uppercase">Movie Companion</Text>
+                        <Text className="text-slate-500 dark:text-gray-400 text-xs tracking-widest uppercase">Movie Companion</Text>
                     </View>
                     {user && (
                         <View className="flex-row items-center">
-                            <View className="bg-slate-800 px-3 py-1 rounded-full border border-slate-700 mr-2">
-                                <Text className="text-indigo-400 font-bold text-xs">{user.name}</Text>
+                            <View className="bg-slate-100 dark:bg-slate-800 px-3 py-1 rounded-full border border-slate-200 dark:border-slate-700 mr-2">
+                                <Text className="text-indigo-600 dark:text-indigo-400 font-bold text-xs">{user.name}</Text>
                             </View>
                         </View>
                     )}
@@ -118,15 +121,15 @@ export default function HomeScreen({ navigation, route }) {
 
                 {/* Search Bar Trigger */}
                 <TouchableOpacity
-                    className="bg-slate-800 border border-slate-700 rounded-2xl flex-row items-center px-4 py-3 mb-6"
+                    className="bg-slate-100 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-2xl flex-row items-center px-4 py-3 mb-6"
                     activeOpacity={0.8}
                     onPress={() => navigation.navigate('Search', { user })}
                 >
-                    <Text className="text-indigo-400 text-lg mr-3">🔍</Text>
-                    <Text className="text-gray-500 font-medium">Search for movies...</Text>
+                    <Text className="text-indigo-500 dark:text-indigo-400 text-lg mr-3">🔍</Text>
+                    <Text className="text-slate-500 dark:text-gray-500 font-medium">Search for movies...</Text>
                 </TouchableOpacity>
 
-                <Text className="text-xl font-bold text-white mb-4">Trending Now</Text>
+                <Text className="text-xl font-bold text-slate-900 dark:text-white mb-4">Trending Now</Text>
 
                 {loading ? (
                     <ActivityIndicator size="large" color="#6366f1" className="mt-20" />

@@ -1,67 +1,46 @@
-import React, { useState, useCallback } from 'react';
-import { View, Text, TouchableOpacity, Image, StatusBar } from 'react-native';
-import { SafeAreaView } from 'react-native-safe-area-context';
-import { useFocusEffect } from '@react-navigation/native';
-import config from '../constants/config';
+import { useTheme } from '../context/ThemeContext';
+import { Ionicons } from '@expo/vector-icons';
 
 export default function ProfileScreen({ route, navigation }) {
     const { user: initialUser } = route.params || {};
     const [user, setUser] = useState(initialUser);
+    const { colorScheme, toggleColorScheme } = useTheme();
 
-    const fetchUserData = async () => {
-        if (!user?.email) return;
-        try {
-            const response = await fetch(`${config.API_URL}/users/${user.email}`);
-            if (response.ok) {
-                const data = await response.json();
-                setUser(data);
-            }
-        } catch (error) {
-            console.error('Error refreshing profile:', error);
-        }
-    };
-
-    useFocusEffect(
-        useCallback(() => {
-            fetchUserData();
-        }, [])
-    );
-
-    const handleLogout = () => {
-        navigation.reset({
-            index: 0,
-            routes: [{ name: 'Login' }],
-        });
-    };
+    // ... (rest of the code)
 
     return (
-        <SafeAreaView className="flex-1 bg-slate-900">
-            <StatusBar barStyle="light-content" />
+        <SafeAreaView className="flex-1 bg-white dark:bg-slate-900">
+            <StatusBar barStyle={colorScheme === 'dark' ? "light-content" : "dark-content"} />
             <View className="flex-1 px-6 pt-4">
-                <Text className="text-3xl font-extrabold text-white mb-8">Profile</Text>
+                <View className="flex-row justify-between items-center mb-8">
+                    <Text className="text-3xl font-extrabold text-slate-900 dark:text-white">Profile</Text>
+                    <TouchableOpacity onPress={toggleColorScheme} className="bg-slate-200 dark:bg-slate-800 p-2 rounded-full">
+                        <Ionicons name={colorScheme === 'dark' ? "sunny" : "moon"} size={24} color={colorScheme === 'dark' ? "#fbbf24" : "#6366f1"} />
+                    </TouchableOpacity>
+                </View>
 
                 <View className="items-center mb-10">
-                    <View className="w-24 h-24 rounded-full bg-slate-800 border-2 border-indigo-500 items-center justify-center overflow-hidden mb-4 shadow-lg shadow-indigo-500/20">
+                    <View className="w-24 h-24 rounded-full bg-slate-100 dark:bg-slate-800 border-2 border-indigo-500 items-center justify-center overflow-hidden mb-4 shadow-lg shadow-indigo-500/20">
                         {user?.picture ? (
                             <Image source={{ uri: user.picture }} className="w-full h-full" />
                         ) : (
                             <Text className="text-4xl">👤</Text>
                         )}
                     </View>
-                    <Text className="text-2xl font-bold text-white">{user?.name || 'User Name'}</Text>
-                    <Text className="text-gray-400 text-base">{user?.email || 'user@example.com'}</Text>
-                    {user?.nickname && <Text className="text-indigo-400 mt-1">@{user.nickname}</Text>}
+                    <Text className="text-2xl font-bold text-slate-900 dark:text-white">{user?.name || 'User Name'}</Text>
+                    <Text className="text-slate-500 dark:text-gray-400 text-base">{user?.email || 'user@example.com'}</Text>
+                    {user?.nickname && <Text className="text-indigo-500 dark:text-indigo-400 mt-1">@{user.nickname}</Text>}
                 </View>
 
-                <View className="bg-slate-800 rounded-2xl p-4 mb-6">
-                    <Text className="text-gray-400 text-sm mb-2 uppercase tracking-wider font-semibold">Account Details</Text>
-                    <View className="flex-row justify-between py-3 border-b border-slate-700">
-                        <Text className="text-white">Member Since</Text>
-                        <Text className="text-gray-400">{user?.createdAt ? new Date(user.createdAt).toLocaleDateString() : 'N/A'}</Text>
+                <View className="bg-slate-100 dark:bg-slate-800 rounded-2xl p-4 mb-6">
+                    <Text className="text-slate-500 dark:text-gray-400 text-sm mb-2 uppercase tracking-wider font-semibold">Account Details</Text>
+                    <View className="flex-row justify-between py-3 border-b border-slate-200 dark:border-slate-700">
+                        <Text className="text-slate-900 dark:text-white">Member Since</Text>
+                        <Text className="text-slate-500 dark:text-gray-400">{user?.createdAt ? new Date(user.createdAt).toLocaleDateString() : 'N/A'}</Text>
                     </View>
                     <View className="flex-row justify-between py-3">
-                        <Text className="text-white">Watchlist Items</Text>
-                        <Text className="text-gray-400">{user?.watchlist?.length || 0}</Text>
+                        <Text className="text-slate-900 dark:text-white">Watchlist Items</Text>
+                        <Text className="text-slate-500 dark:text-gray-400">{user?.watchlist?.length || 0}</Text>
                     </View>
                 </View>
 
