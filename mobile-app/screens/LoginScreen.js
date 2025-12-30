@@ -1,16 +1,30 @@
 import { Ionicons } from '@expo/vector-icons';
 import * as SecureStore from 'expo-secure-store';
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { View, Text, TextInput, TouchableOpacity, Alert, StatusBar, ActivityIndicator } from 'react-native';
+import { KeyboardAwareScrollView } from 'react-native-keyboard-aware-scroll-view';
 import { SafeAreaView } from 'react-native-safe-area-context';
 // import axios from 'axios';
 import config from '../constants/config';
+import SuccessModal from '../components/SuccessModal';
 
-export default function LoginScreen({ navigation }) {
+export default function LoginScreen({ navigation, route }) {
     const [email, setEmail] = useState('');
     const [password, setPassword] = useState('');
     const [showPassword, setShowPassword] = useState(false);
     const [loading, setLoading] = useState(false);
+    const [modalVisible, setModalVisible] = useState(false);
+
+    useEffect(() => {
+        if (route.params?.signupSuccess) {
+            setModalVisible(true);
+            navigation.setParams({ signupSuccess: undefined });
+        }
+    }, [route.params?.signupSuccess]);
+
+    const handleModalClose = () => {
+        setModalVisible(false);
+    };
 
     const handleLogin = async () => {
         if (!email || !password) {
@@ -54,12 +68,25 @@ export default function LoginScreen({ navigation }) {
         <SafeAreaView className="flex-1 bg-slate-900">
             <StatusBar barStyle="light-content" />
 
+            <SuccessModal
+                visible={modalVisible}
+                onClose={handleModalClose}
+                message="Your account has been created successfully. Please login."
+            />
+
             {/* Decorative Background Elements */}
             <View className="absolute top-[-50] left-[-50] w-60 h-60 bg-indigo-500 rounded-full opacity-20" />
             <View className="absolute top-[20%] right-[-30] w-40 h-40 bg-purple-500 rounded-full opacity-20" />
             <View className="absolute bottom-[-20] right-[-20] w-72 h-72 bg-indigo-600 rounded-full opacity-10" />
 
-            <View className="flex-1 justify-center px-8">
+            <KeyboardAwareScrollView
+                enableOnAndroid={true}
+                extraScrollHeight={20}
+                contentContainerStyle={{ flexGrow: 1, justifyContent: 'center' }}
+                className="px-8"
+                showsVerticalScrollIndicator={false}
+                keyboardShouldPersistTaps="handled"
+            >
                 <View className="items-center mb-12">
                     <View className="w-20 h-20 bg-indigo-500/20 rounded-3xl items-center justify-center mb-4 border border-indigo-500/30">
                         <Ionicons name="film-outline" size={40} color="#818cf8" />
@@ -74,7 +101,7 @@ export default function LoginScreen({ navigation }) {
 
                 <View className="space-y-6">
                     <View>
-                        <Text className="text-gray-400 mb-2 ml-1 font-medium text-sm">Email Address</Text>
+                        <Text className="text-gray-400 mb-2 ml-1 font-medium text-base">Email Address</Text>
                         <View className="flex-row items-center bg-slate-800/80 border border-slate-700 rounded-2xl px-4 py-3 focus:border-indigo-500 focus:bg-slate-800 transition-all">
                             <Ionicons name="mail-outline" size={20} color="#94a3b8" style={{ marginRight: 10 }} />
                             <TextInput
@@ -90,7 +117,7 @@ export default function LoginScreen({ navigation }) {
                     </View>
 
                     <View>
-                        <Text className="text-gray-400 mb-2 ml-1 font-medium text-sm">Password</Text>
+                        <Text className="text-gray-400 mb-2 ml-1 font-medium text-base">Password</Text>
                         <View className="flex-row items-center bg-slate-800/80 border border-slate-700 rounded-2xl px-4 py-3 focus:border-indigo-500">
                             <Ionicons name="lock-closed-outline" size={20} color="#94a3b8" style={{ marginRight: 10 }} />
                             <TextInput
@@ -105,7 +132,6 @@ export default function LoginScreen({ navigation }) {
                                 <Ionicons name={showPassword ? "eye-outline" : "eye-off-outline"} size={20} color="#94a3b8" />
                             </TouchableOpacity>
                         </View>
-                      
                     </View>
 
                     <TouchableOpacity
@@ -130,7 +156,7 @@ export default function LoginScreen({ navigation }) {
                         <Text className="text-indigo-400 font-bold">Create Account</Text>
                     </TouchableOpacity>
                 </View>
-            </View>
+            </KeyboardAwareScrollView>
         </SafeAreaView>
     );
 }

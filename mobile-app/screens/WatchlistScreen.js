@@ -1,7 +1,8 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useCallback } from 'react';
 import { View, Text, SafeAreaView as RNSafeAreaView, StatusBar, TouchableOpacity, FlatList, Image, Alert } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { Ionicons } from '@expo/vector-icons';
+import { useFocusEffect } from '@react-navigation/native';
 // import axios from 'axios';
 import config from '../constants/config';
 import { Toast } from '../components/Toast';
@@ -29,6 +30,12 @@ export default function WatchlistScreen({ route, navigation }) {
             console.error('Error refreshing user data:', error);
         }
     };
+
+    useFocusEffect(
+        useCallback(() => {
+            fetchUserData();
+        }, [user?.email])
+    );
 
     const [toastVisible, setToastVisible] = useState(false);
     const [toastMessage, setToastMessage] = useState('');
@@ -77,10 +84,6 @@ export default function WatchlistScreen({ route, navigation }) {
         await fetchUserData();
         setRefreshing(false);
     };
-
-    useEffect(() => {
-        fetchUserData();
-    }, []);
 
     useEffect(() => {
         if (user?.watchlist) {

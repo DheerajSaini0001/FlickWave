@@ -1,6 +1,7 @@
 import { Ionicons } from '@expo/vector-icons';
 import React, { useState } from 'react';
-import { View, Text, TextInput, TouchableOpacity, Alert, ScrollView, StatusBar, ActivityIndicator } from 'react-native';
+import { View, Text, TextInput, TouchableOpacity, Alert, StatusBar, ActivityIndicator } from 'react-native';
+import { KeyboardAwareScrollView } from 'react-native-keyboard-aware-scroll-view';
 import { SafeAreaView } from 'react-native-safe-area-context';
 // import axios from 'axios';
 import config from '../constants/config';
@@ -41,8 +42,7 @@ export default function SignupScreen({ navigation }) {
             }
 
             console.log('Signup successful:', data);
-            Alert.alert('Success', 'Account created! Please login.');
-            navigation.navigate('Login');
+            navigation.navigate('Login', { signupSuccess: true });
         } catch (error) {
             console.error('Signup error:', error);
             Alert.alert('Signup Failed', error.message || 'Something went wrong');
@@ -69,17 +69,22 @@ export default function SignupScreen({ navigation }) {
                 </TouchableOpacity>
             </View>
 
-            <ScrollView contentContainerStyle={{ flexGrow: 1, justifyContent: 'center', paddingBottom: 40 }} className="px-8">
+            <KeyboardAwareScrollView
+                enableOnAndroid={true}
+                extraScrollHeight={20}
+                contentContainerStyle={{ flexGrow: 1, justifyContent: 'center', paddingBottom: 40 }}
+                className="px-8"
+                showsVerticalScrollIndicator={false}
+                keyboardShouldPersistTaps="handled"
+            >
                 <View className="mb-8 mt-4">
-
-
                     <Text className="text-3xl font-bold text-white mb-2 tracking-wide">Create Account</Text>
                     <Text className="text-gray-400 text-base">Join FlickWave regarding to start your journey</Text>
                 </View>
 
                 <View className="space-y-5">
                     <View>
-                        <Text className="text-gray-400 mb-2 ml-1 font-medium text-sm">Full Name</Text>
+                        <Text className="text-gray-400 mb-2 ml-1 font-medium text-base">Full Name</Text>
                         <View className="flex-row items-center bg-slate-800/80 border border-slate-700 rounded-2xl px-4 py-3 focus:border-indigo-500">
                             <Ionicons name="person-outline" size={20} color="#94a3b8" style={{ marginRight: 10 }} />
                             <TextInput
@@ -93,7 +98,7 @@ export default function SignupScreen({ navigation }) {
                     </View>
 
                     <View>
-                        <Text className="text-gray-400 mb-2 ml-1 font-medium text-sm">Nickname (Optional)</Text>
+                        <Text className="text-gray-400 mb-2 ml-1 font-medium text-base">Nickname (Optional)</Text>
                         <View className="flex-row items-center bg-slate-800/80 border border-slate-700 rounded-2xl px-4 py-3 focus:border-indigo-500">
                             <Ionicons name="happy-outline" size={20} color="#94a3b8" style={{ marginRight: 10 }} />
                             <TextInput
@@ -107,7 +112,7 @@ export default function SignupScreen({ navigation }) {
                     </View>
 
                     <View>
-                        <Text className="text-gray-400 mb-2 ml-1 font-medium text-sm">Email Address</Text>
+                        <Text className="text-gray-400 mb-2 ml-1 font-medium text-base">Email Address</Text>
                         <View className="flex-row items-center bg-slate-800/80 border border-slate-700 rounded-2xl px-4 py-3 focus:border-indigo-500">
                             <Ionicons name="mail-outline" size={20} color="#94a3b8" style={{ marginRight: 10 }} />
                             <TextInput
@@ -123,7 +128,7 @@ export default function SignupScreen({ navigation }) {
                     </View>
 
                     <View>
-                        <Text className="text-gray-400 mb-2 ml-1 font-medium text-sm">Password</Text>
+                        <Text className="text-gray-400 mb-2 ml-1 font-medium text-base">Password</Text>
                         <View className="flex-row items-center bg-slate-800/80 border border-slate-700 rounded-2xl px-4 py-3 focus:border-indigo-500">
                             <Ionicons name="lock-closed-outline" size={20} color="#94a3b8" style={{ marginRight: 10 }} />
                             <TextInput
@@ -162,7 +167,7 @@ export default function SignupScreen({ navigation }) {
                         <Text className="text-indigo-400 font-bold">Sign In</Text>
                     </TouchableOpacity>
                 </View>
-            </ScrollView>
-        </SafeAreaView>
+            </KeyboardAwareScrollView>
+        </SafeAreaView >
     );
 }
