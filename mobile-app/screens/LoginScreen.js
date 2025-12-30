@@ -105,9 +105,7 @@ export default function LoginScreen({ navigation }) {
                                 <Ionicons name={showPassword ? "eye-outline" : "eye-off-outline"} size={20} color="#94a3b8" />
                             </TouchableOpacity>
                         </View>
-                        <TouchableOpacity className="self-end mt-2">
-                            <Text className="text-indigo-400 text-xs font-medium">Forgot Password?</Text>
-                        </TouchableOpacity>
+                      
                     </View>
 
                     <TouchableOpacity

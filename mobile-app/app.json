@@ -1,7 +1,7 @@
 {
   "expo": {
-    "name": "WaveFlick",
-    "slug": "WaveFlick",
+    "name": "FlickWave",
+    "slug": "FlickWave",
     "version": "1.0.0",
     "orientation": "portrait",
     "icon": "./assets/adaptive-icon.png",
@@ -20,13 +20,19 @@
         "foregroundImage": "./assets/adaptive-icon.png",
         "backgroundColor": "#ffffff"
       },
-      "edgeToEdgeEnabled": true
+      "edgeToEdgeEnabled": true,
+      "package": "com.dheerajsaini0001.FlickWave"
     },
     "web": {
       "favicon": "./assets/adaptive-icon.png"
     },
     "plugins": [
       "expo-secure-store"
-    ]
+    ],
+    "extra": {
+      "eas": {
+        "projectId": "23bc3033-1cae-4873-8a15-0c563bd1190b"
+      }
+    }
   }
 }

@@ -60,14 +60,18 @@ export default function SignupScreen({ navigation }) {
             <View className="absolute top-[20%] right-[-30] w-40 h-40 bg-purple-500 rounded-full opacity-20" />
             <View className="absolute bottom-[-20] right-[-20] w-72 h-72 bg-indigo-600 rounded-full opacity-10" />
 
+            <View className="px-8 mt-4 w-full">
+                <TouchableOpacity
+                    onPress={() => navigation.goBack()}
+                    className="w-10 h-10 bg-slate-800 rounded-full items-center justify-center"
+                >
+                    <Ionicons name="arrow-back" size={24} color="white" />
+                </TouchableOpacity>
+            </View>
+
             <ScrollView contentContainerStyle={{ flexGrow: 1, justifyContent: 'center', paddingBottom: 40 }} className="px-8">
                 <View className="mb-8 mt-4">
-                    <TouchableOpacity
-                        onPress={() => navigation.goBack()}
-                        className="w-10 h-10 bg-slate-800 rounded-full items-center justify-center mb-6"
-                    >
-                        <Ionicons name="arrow-back" size={24} color="white" />
-                    </TouchableOpacity>
+
 
                     <Text className="text-3xl font-bold text-white mb-2 tracking-wide">Create Account</Text>
                     <Text className="text-gray-400 text-base">Join FlickWave regarding to start your journey</Text>
