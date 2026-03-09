@@ -8,7 +8,7 @@ const Footer = () => {
 
     return (
         <footer className={`py-12 border-t relative overflow-hidden transition-colors duration-300 ${darkMode
-            ? "bg-[#0f1014] border-white/5"
+            ? "bg-[#0a0b0f] border-white/5"
             : "bg-gray-50 border-gray-200"
             }`}>
             {/* Ambient Glow - Adjusted opacity for light mode */}
@@ -63,7 +63,7 @@ const Footer = () => {
                     }`}>
                     Made with <span className="text-red-500 animate-pulse">❤️</span> by Dheeraj Saini
                 </p>
-                
+
             </div>
         </footer>
     );

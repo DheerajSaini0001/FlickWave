@@ -17,7 +17,6 @@ import { useTheme } from "../context/ThemeContext";
 
 const CategoryPage = () => {
     const { darkMode } = useTheme();
-
     const { type, category } = useParams();
     const [items, setItems] = useState([]);
     const [loading, setLoading] = useState(true);
@@ -26,7 +25,6 @@ const CategoryPage = () => {
     useEffect(() => {
         const fetchData = async () => {
             setLoading(true);
-
             try {
                 let res;
                 let pageTitle = "";
@@ -89,48 +87,61 @@ const CategoryPage = () => {
 
     if (loading) return <Loader />;
 
+    // Staggered grid animation
+    const containerVariants = {
+        hidden: {},
+        visible: {
+            transition: {
+                staggerChildren: 0.05,
+            },
+        },
+    };
+
+    const cardVariants = {
+        hidden: { opacity: 0, y: 40, scale: 0.95 },
+        visible: {
+            opacity: 1,
+            y: 0,
+            scale: 1,
+            transition: {
+                type: 'spring',
+                stiffness: 120,
+                damping: 14,
+            },
+        },
+    };
+
     return (
-        <div
-            className={`min-h-screen pt-28 transition-colors duration-300 ${darkMode ? "bg-[#0f1014]" : "bg-gray-50"
-                }`}
-        >
+        <div className={`min-h-screen pt-28 transition-colors duration-300 ${darkMode ? "bg-[#0a0b0f]" : "bg-gray-50"
+            }`}>
             <div className="container mx-auto px-4 sm:px-6 md:px-8 py-8">
                 <motion.div
                     initial={{ opacity: 0, y: -20 }}
                     animate={{ opacity: 1, y: 0 }}
-                    className="mb-10"
+                    className="mb-10 flex items-center gap-4"
                 >
-                    <h2
-                        className={`text-2xl sm:text-3xl md:text-4xl font-bold border-l-4 border-red-600 pl-4 transition-colors duration-300 ${darkMode ? "text-white" : "text-gray-900"
-                            }`}
-                    >
+                    <div className="w-1 h-10 rounded-full bg-gradient-to-b from-red-500 to-orange-500"></div>
+                    <h2 className={`text-2xl sm:text-3xl md:text-4xl font-bold transition-colors duration-300 ${darkMode ? "text-white" : "text-gray-900"
+                        }`}>
                         {title}
                     </h2>
                 </motion.div>
 
                 <motion.div
-                    layout
-                    className="
-            grid 
-            grid-cols-1 
-            sm:grid-cols-2 
-            md:grid-cols-3 
-            lg:grid-cols-4 
-            xl:grid-cols-5 
-            gap-4 sm:gap-5 md:gap-6
-          "
+                    variants={containerVariants}
+                    initial="hidden"
+                    whileInView="visible"
+                    viewport={{ once: true, margin: '-30px' }}
+                    className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 xl:grid-cols-6 gap-4 sm:gap-5 md:gap-6"
                 >
                     <AnimatePresence>
                         {items.map((item, index) => (
                             <motion.div
                                 key={item.id}
-                                layout
-                                initial={{ opacity: 0, scale: 0.9 }}
-                                animate={{ opacity: 1, scale: 1 }}
-                                transition={{ duration: 0.3, delay: index * 0.05 }}
+                                variants={cardVariants}
                                 className="flex justify-center"
                             >
-                                <MovieCard movie={item} />
+                                <MovieCard movie={item} index={index} />
                             </motion.div>
                         ))}
                     </AnimatePresence>

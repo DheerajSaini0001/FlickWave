@@ -5,10 +5,9 @@ const Loader = () => {
     const { darkMode } = useTheme();
 
     return (
-        <div 
-            className={`flex justify-center items-center h-screen transition-colors duration-300 ${
-                darkMode ? 'bg-[#0f1014]' : 'bg-gray-50'
-            }`}
+        <div
+            className={`flex justify-center items-center h-screen transition-colors duration-300 ${darkMode ? 'bg-[#0a0b0f]' : 'bg-gray-50'
+                }`}
         >
             <div className="relative w-24 h-24">
                 <motion.div

@@ -66,7 +66,7 @@ const MovieDetails = () => {
     };
 
     return (
-        <div className={`pb-10 min-h-screen transition-colors duration-300 ${darkMode ? 'bg-[#0f1014]' : 'bg-gray-50'}`}>
+        <div className={`pb-10 min-h-screen transition-colors duration-300 ${darkMode ? 'bg-[#0a0b0f]' : 'bg-gray-50'}`}>
             <ConfirmModal
                 isOpen={modalConfig.isOpen}
                 onClose={() => setModalConfig({ ...modalConfig, isOpen: false })}
@@ -85,16 +85,14 @@ const MovieDetails = () => {
                     className="absolute inset-0 bg-cover bg-center"
                     style={{ backgroundImage: `url(https://image.tmdb.org/t/p/original${movie.backdrop_path})` }}
                 >
-                     {/* Vertical Gradient - matches theme background */}
-                    <div className={`absolute inset-0 bg-gradient-to-t via-transparent to-transparent ${
-                        darkMode ? 'from-[#0f1014] via-[#0f1014]/80' : 'from-gray-50 via-gray-50/80'
-                    }`} />
-                    
+                    {/* Vertical Gradient - matches theme background */}
+                    <div className={`absolute inset-0 bg-gradient-to-t via-transparent to-transparent ${darkMode ? 'from-[#0a0b0f] via-[#0a0b0f]/80' : 'from-gray-50 via-gray-50/80'
+                        }`} />
+
                     {/* Horizontal Gradient - matches theme background */}
-                    <div className={`absolute inset-0 bg-gradient-to-r to-transparent ${
-                        darkMode ? "from-[#0f1014] via-[#0f1014]/60" 
-      : "from-gray-50 via-gray-50/80"
-                    }`} />
+                    <div className={`absolute inset-0 bg-gradient-to-r to-transparent ${darkMode ? "from-[#0a0b0f] via-[#0a0b0f]/60"
+                            : "from-gray-50 via-gray-50/80"
+                        }`} />
                 </motion.div>
 
                 <div className="absolute bottom-0 left-0 p-8 md:p-12 w-full container mx-auto flex flex-col md:flex-row items-end gap-8 z-10">
@@ -104,9 +102,8 @@ const MovieDetails = () => {
                         transition={{ delay: 0.2 }}
                         src={`https://image.tmdb.org/t/p/w500${movie.poster_path}`}
                         alt={movie.title}
-                        className={`hidden md:block w-64 rounded-xl shadow-2xl border-4 backdrop-blur-sm ${
-                            darkMode ? 'border-white/10' : 'border-white/20'
-                        }`}
+                        className={`hidden md:block w-64 rounded-xl shadow-2xl border-4 backdrop-blur-sm ${darkMode ? 'border-white/10' : 'border-white/20'
+                            }`}
                     />
                     <div className={`pb-4 flex-1 ${darkMode ? 'text-white' : 'text-gray-900'}`}>
                         <motion.h1
@@ -122,13 +119,11 @@ const MovieDetails = () => {
                             initial={{ opacity: 0 }}
                             animate={{ opacity: 1 }}
                             transition={{ delay: 0.4 }}
-                            className={`flex flex-wrap items-center gap-4 text-sm md:text-base mb-6 ${
-                                darkMode ? 'text-gray-300' : 'text-gray-600'
-                            }`}
+                            className={`flex flex-wrap items-center gap-4 text-sm md:text-base mb-6 ${darkMode ? 'text-gray-300' : 'text-gray-600'
+                                }`}
                         >
-                            <span className={`px-2 py-0.5 rounded backdrop-blur-sm border ${
-                                darkMode ? 'border-white/20' : 'border-gray-900/20'
-                            }`}>
+                            <span className={`px-2 py-0.5 rounded backdrop-blur-sm border ${darkMode ? 'border-white/20' : 'border-gray-900/20'
+                                }`}>
                                 {movie.release_date ? new Date(movie.release_date).getFullYear() : 'N/A'}
                             </span>
                             <span>•</span>
@@ -146,11 +141,10 @@ const MovieDetails = () => {
                             className="flex flex-wrap gap-2 mb-8"
                         >
                             {movie.genres.map(g => (
-                                <span key={g.id} className={`backdrop-blur-md px-4 py-1.5 rounded-full text-sm font-medium border transition-colors cursor-default ${
-                                    darkMode 
-                                        ? 'bg-white/10 border-white/10 hover:bg-white/20 text-white' 
+                                <span key={g.id} className={`backdrop-blur-md px-4 py-1.5 rounded-full text-sm font-medium border transition-colors cursor-default ${darkMode
+                                        ? 'bg-white/10 border-white/10 hover:bg-white/20 text-white'
                                         : 'bg-black/5 border-black/10 hover:bg-black/10 text-gray-900'
-                                }`}>
+                                    }`}>
                                     {g.name}
                                 </span>
                             ))}
@@ -267,11 +261,10 @@ const MovieDetails = () => {
                             initial={{ opacity: 0, x: 20 }}
                             whileInView={{ opacity: 1, x: 0 }}
                             viewport={{ once: true }}
-                            className={`p-6 rounded-2xl shadow-lg border ${
-                                darkMode 
-                                    ? 'bg-[#1a1c24] border-gray-800' 
+                            className={`p-6 rounded-2xl shadow-lg border ${darkMode
+                                    ? 'bg-[#1a1c24] border-gray-800'
                                     : 'bg-white border-gray-100'
-                            }`}
+                                }`}
                         >
                             <h3 className={`text-xl font-bold mb-4 ${darkMode ? 'text-white' : 'text-gray-900'}`}>Movie Info</h3>
                             <div className="space-y-4">

@@ -28,14 +28,14 @@ const Login = () => {
     };
 
     return (
-        <div className={`min-h-screen flex items-center justify-center px-4 transition-colors duration-300 ${darkMode ? 'bg-[#0f1014]' : 'bg-gray-50'
+        <div className={`min-h-screen flex items-center justify-center px-4 transition-colors duration-300 ${darkMode ? 'bg-[#0a0b0f]' : 'bg-gray-50'
             }`}>
             <motion.div
                 initial={{ opacity: 0, scale: 0.9 }}
                 animate={{ opacity: 1, scale: 1 }}
                 className={`p-8 rounded-2xl shadow-2xl w-full max-w-md border transition-colors duration-300 ${darkMode
-                        ? 'bg-[#1a1c24] border-white/10'
-                        : 'bg-white border-gray-200'
+                    ? 'bg-[#1a1c24] border-white/10'
+                    : 'bg-white border-gray-200'
                     }`}
             >
                 <h2 className={`text-3xl font-bold mb-6 text-center transition-colors ${darkMode ? 'text-white' : 'text-gray-900'
@@ -60,8 +60,8 @@ const Login = () => {
                             value={email}
                             onChange={(e) => setEmail(e.target.value)}
                             className={`w-full rounded-lg px-4 py-3 focus:outline-none focus:border-red-600 transition-colors ${darkMode
-                                    ? 'bg-black/20 border-white/10 text-white placeholder-gray-600'
-                                    : 'bg-gray-50 border-gray-200 text-gray-900 placeholder-gray-400'
+                                ? 'bg-black/20 border-white/10 text-white placeholder-gray-600'
+                                : 'bg-gray-50 border-gray-200 text-gray-900 placeholder-gray-400'
                                 }`}
                             placeholder="name@example.com"
                             required
@@ -77,8 +77,8 @@ const Login = () => {
                             value={password}
                             onChange={(e) => setPassword(e.target.value)}
                             className={`w-full rounded-lg px-4 py-3 focus:outline-none focus:border-red-600 transition-colors ${darkMode
-                                    ? 'bg-black/20 border-white/10 text-white placeholder-gray-600'
-                                    : 'bg-gray-50 border-gray-200 text-gray-900 placeholder-gray-400'
+                                ? 'bg-black/20 border-white/10 text-white placeholder-gray-600'
+                                : 'bg-gray-50 border-gray-200 text-gray-900 placeholder-gray-400'
                                 }`}
                             placeholder="••••••••"
                             required
